@@ -93,7 +93,7 @@ trait ValidationTrait
                 // then do not perform the validation.
                 $payload = $prunedPayload[$field] ?? null;
                 
-                $invocationParams = [$field, $payload, $rule['params']];
+                $invocationParams = [$field, optional($payload), $rule['params']];
                 $error = $this->callProtectedMethod(
                     $model,
                     $rule['rule'],
@@ -110,7 +110,7 @@ trait ValidationTrait
                 $ruleName = 'validate' . Str::studly($rule);
                 if (in_array($ruleName, $modelMethods) === false)
                     continue;
-                $invocationParams = ['model', $fullPayload, $params];
+                $invocationParams = ['model', optional($fullPayload), $params];
                 $error = $this->callProtectedMethod(
                     $model,
                     $ruleName,
