@@ -128,7 +128,7 @@ class Foo extends Model
 ```
 
 ### Unique and exists validations
-Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
+Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy — just define `unique` or `exists` with no further parameters. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
 
 <br>
 
