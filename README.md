@@ -127,12 +127,14 @@ class Foo extends Model
 }
 ```
 
+<br>
+
 #### Unique and exists validations
 Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy — just define `unique` or `exists` with no further parameters. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
 
 <br>
 
-### Custom validation rules
+#### Custom validation rules
 RestEast also offers easy custom validation rules, as well as model-based rules which take multiple fields (of the model) into account. Simply define a method using the 'validate' + RuleName ([studly](https://laravel.com/docs/7.x/helpers#method-studly-case) case) convention, and refer to it using the rule_name ([camel](https://laravel.com/docs/7.x/helpers#method-fluent-str-camel) case) convention. 
 
 For example, the rule below named `not_reserved` will look for the `validateNotReserved` method. The rule is considered to fail if anything other than null (ie, an error message) is returned. If an error message is returned, that is what will be returned in the request response.
@@ -170,7 +172,9 @@ class Foo extends Model
     }
 }
 ```
-Other points to mention for custom validation rules:
+
+
+#### Other points to mention for custom validation rules
 
 - the `$field` parameter refers to the field being validated, which may also be 'model' in the case of model rules
 - the `$value` parameter refers to the value being validated, which in the case of model rules will be the full payload. This `$value` is [optional](https://laravel.com/docs/7.x/helpers#method-optional), so if you're expecting an array or an object, then it's safe to access `$value->doesNotExist` or `$value['does_not_exist']` without fear or errors

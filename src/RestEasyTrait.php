@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 use ROTGP\RestEasy\Traits\ArrayUtilsTrait;
-use ROTGP\RestEasy\Traits\EloquentGuardTrait;
+use ROTGP\RestEasy\Traits\PermissionTrait;
 use ROTGP\RestEasy\Traits\QueryTrait;
 use ROTGP\RestEasy\Traits\ResponseTrait;
 use ROTGP\RestEasy\Traits\MetaTrait;
@@ -25,7 +25,7 @@ trait RestEasyTrait
     use ResponseTrait;
     use ArrayUtilsTrait;
     use QueryTrait;
-    use EloquentGuardTrait;
+    use PermissionTrait;
     use MetaTrait;
     use ValidationTrait;
     use RequestTrait;

@@ -12,7 +12,7 @@ use ReflectionClass;
 use App;
 use Carbon\Carbon;
 
-trait EloquentGuardTrait
+trait PermissionTrait
 {      
     protected $debugEvents = [];
     protected $eventNames = [
