@@ -132,7 +132,7 @@ Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#
 
 <br>
 
-### Custom validations rules
+### Custom validation rules
 RestEast also offers easy custom validation rules, as well as model-based rules which take multiple fields (of the model) into account. Simply define a method using the 'validate' + RuleName ([studly](https://laravel.com/docs/7.x/helpers#method-studly-case) case) convention, and refer to it using the rule_name ([camel](https://laravel.com/docs/7.x/helpers#method-fluent-str-camel) case) convention. 
 
 For example, the rule below named `not_reserved` will look for the `validateNotReserved` method. The rule is considered to fail if anything other than null (ie, an error message) is returned. If an error message is returned, that is what will be returned in the request response.
@@ -173,9 +173,9 @@ class Foo extends Model
 Other points to mention for custom validation rules:
 
 - the `$field` parameter refers to the field being validated, which may also be 'model' in the case of model rules
-- the `$value` parameter refers to the value being validated, which in the case of model rules. This `$value` is [optional](https://laravel.com/docs/7.x/helpers#method-optional), so if you're expecting an array or an object, then it's safe to access `$value->doesNotExist` or `$value['does_not_exist']` without fear or errors
+- the `$value` parameter refers to the value being validated, which in the case of model rules will be the full payload. This `$value` is [optional](https://laravel.com/docs/7.x/helpers#method-optional), so if you're expecting an array or an object, then it's safe to access `$value->doesNotExist` or `$value['does_not_exist']` without fear or errors
 - when updating a model, any fields missing from the payload will be filled with the model's existing data. In this sense, RestEasy offers [PATCH](https://en.wikipedia.org/wiki/Patch_verb)-like functionality when making [PUT](https://en.wikipedia.org/wiki/Put) requests
-- similarly, when updating a model, any custom validation methods may make reference to `$this`, which refers to the model itself
+- similarly, when updating a model, any custom validation methods may make reference to `$this`, which refers to the model being updated
 - the `$params` parameter refers to the parameters (an array) to be passed from the rule definitions (ie: `'foo:bar,baz'`). If no params are passed, then this array will be empty
 
 <br>
