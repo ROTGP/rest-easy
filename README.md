@@ -127,7 +127,7 @@ class Foo extends Model
 }
 ```
 
-### Unique and exists validations
+#### Unique and exists validations
 Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy — just define `unique` or `exists` with no further parameters. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
 
 <br>
@@ -176,7 +176,7 @@ Other points to mention for custom validation rules:
 - the `$value` parameter refers to the value being validated, which in the case of model rules will be the full payload. This `$value` is [optional](https://laravel.com/docs/7.x/helpers#method-optional), so if you're expecting an array or an object, then it's safe to access `$value->doesNotExist` or `$value['does_not_exist']` without fear or errors
 - when updating a model, any fields missing from the payload will be filled with the model's existing data. In this sense, RestEasy offers [PATCH](https://en.wikipedia.org/wiki/Patch_verb)-like functionality when making [PUT](https://en.wikipedia.org/wiki/Put) requests
 - similarly, when updating a model, any custom validation methods may make reference to `$this`, which refers to the model being updated
-- the `$params` parameter refers to the parameters (an array) to be passed from the rule definitions (ie: `'foo:bar,baz'`). If no params are passed, then this array will be empty
+- the `$params` parameter refers to the parameters (an array) to be passed from the rule definitions. For example, the `validateFoo` method for the `'foo:bar,baz'` rule definition will receive the `$params` of `['bar', 'baz']`. If no params are passed, then this array will be empty.
 
 <br>
 
