@@ -1,8 +1,52 @@
-# RestEasy
-A non-invasive PHP trait for [Laravel](https://laravel.com/) [Controllers](https://laravel.com/docs/7.x/controllers), to ensure a simpler, more secure REST API.
+Introduction
+=================
+RestEasy is a PHP [trait](https://www.php.net/manual/en/language.oop5.traits.php) for [Laravel](https://laravel.com/) [Controllers](https://laravel.com/docs/7.x/controllers), to ensure simpler, more secure REST APIs. The aim is to **heavily** reduce [boilerplate](https://stackoverflow.com/a/3992211/1985175) code, whilst enabling fine-grained control over validation, security, permissions, access-control, and [much more](#features-at-a-glance).
+
+It implements and encourages [object-oriented design](https://en.wikipedia.org/wiki/Object-oriented_design), and has zero-dependencies (apart from [Laravel](https://laravel.com/) itself).
+
+It is designed to be non-invasive — simply remove the trait from your controller to return to standard Laravel functionality. There's no need to extend, implement or subclass any code.
+
+<br>
 
 
-## Installation
+Why?
+===
+
+I got tired of rewriting the same boilerplate code every time I started a new Laravel project, or even a new model/controller. It became too much code to maintain, for seemingly repetitive funcionality. 
+
+Security, authentication, and access-control were also a concern — Laravel provides great mechanisms but it requires you to implement them explicitly, which again results in a lot of codebase to manage.
+
+<br>
+
+
+Table of contents
+=================
+
+   * [Introduction](#introduction)
+   * [Why?](#why)
+   * [Table of contents](#table-of-contents)
+   * [Installation](#installation)
+   * [Features-at-a-glance](#features-at-a-glance)
+   * [Model discovery](#model-discovery)
+   * [Tests](#tests)
+   * [Contributing](#contributing)
+   * [License](#license)
+
+
+Features at a glance
+====================
+
+* Validation
+* Permissions
+* Querying
+* Syncing
+* Response
+* Error handling
+
+
+
+Installation
+============
 
 Use the package manager [Composer](https://getcomposer.org/) to install RestEasy.
 
@@ -11,6 +55,9 @@ composer require rotgp/rest-easy
 ```
 
 ## Usage
+
+Just drop the trait into your controller.
+
 ```php
 use Illuminate\Routing\Controller;
 
@@ -20,7 +67,7 @@ class FooController extends Controller
 }
 ```
 
-Now, associate your [route](https://laravel.com/docs/7.x/routing) with your [controller](https://laravel.com/docs/7.x/controllers) as you always would. The standard Laravel [resource](https://laravel.com/docs/7.x/controllers#resource-controllers) will automatically map to the standard methods (`index`, `show`, `update`, `store`, `destroy`) in the `RestEasyTrait`. 
+Now, associate your [route](https://laravel.com/docs/7.x/routing) with your [controller](https://laravel.com/docs/7.x/controllers) as you normally would. The standard Laravel [resource](https://laravel.com/docs/7.x/controllers#resource-controllers) will automatically map to the standard methods (`index`, `show`, `update`, `store`, `destroy`) in the `RestEasyTrait`. 
 
 
 ```php
@@ -35,16 +82,12 @@ Route::resource('foos', 'FooController')->only([
 ]);
 ```
 
+<br>
 
-
-
-
-## App structure
-The model associated with the controller is automatically inferred. A `FooController` will look for the `Foo` model in several locations of the app namespace. First in the top-level, then in `namespace/Model` or `namespace/Models`. 
+## Model discovery
+The model associated with the controller is a standard vanilla [eloquent model](https://laravel.com/docs/7.x/eloquent), requiring no special traits. A `FooController` will look for the `Foo` model in several locations of the app namespace. First in the top-level, then in `namespace\Model` or `namespace\Models`. 
 
 Alternatively, the controller may implement the `modelNamespace` method, which returns either the namespace where the model is defined, or the fully qualified namespace of the model itself. The former is a good solution for base controller classes wanting to define a custom location for models. 
-
-The associated model is a standard vanilla eloquent model, requiring no special traits.
 
 
 ```php
@@ -54,8 +97,6 @@ class BaseController extends Controller
 {
     use RestEasyTrait;
     
-    // define a custom namespace where all controllers
-    // extending this class should find their model
     protected function modelNamespace()
     {
         return 'Org\Foo\Bar\Custom\Location\Models';
@@ -64,10 +105,10 @@ class BaseController extends Controller
 ```
 
 ## Validation
-Laravel [Validation](https://laravel.com/docs/7.x/validation) is powerful, but it can be painful and tedious. This trait aims to make validation automatic, simple, and flexible. Validation is automatically performed with `update` and `store` 
+Laravel [Validation](https://laravel.com/docs/7.x/validation) is powerful, but it can be painful and tedious. This trait aims to make validation automatic, simple, and flexible. Validation is automatically performed on all `update` and `store` 
  (`PUT` and `POST`) requests. 
 
-Simply define your rules in your model using the `validationRules` method. This method also includes an [optional](https://laravel.com/docs/7.x/helpers#method-optional) `$authUser` parameter, allowing conditional validation based on the auth user making the request. 
+Simply define your [rules](https://laravel.com/docs/7.x/validation#available-validation-rules) in your model using the `validationRules` method. This method also includes an [optional](https://laravel.com/docs/7.x/helpers#method-optional) `$authUser` parameter, allowing conditional validation based on the auth user making the request. 
 
 
 ```php
@@ -86,13 +127,17 @@ class Foo extends Model
 }
 ```
 
-The above example will validate the name, title, and bar_id of the Foo object. All rules are standard Laravel [rules](https://laravel.com/docs/7.x/validation#available-validation-rules). 
+### Unique and exists validations
+Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
 
-Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as the id of the model being updated. This is all taken care of automatically with RestEasy. However, if you wish to define these rules manually, RestEasy won't interfere.
+<br>
 
+### Custom validations rules
 RestEast also offers easy custom validation rules, as well as model-based rules which take multiple fields (of the model) into account. Simply define a method using the 'validate' + RuleName ([studly](https://laravel.com/docs/7.x/helpers#method-studly-case) case) convention, and refer to it using the rule_name ([camel](https://laravel.com/docs/7.x/helpers#method-fluent-str-camel) case) convention. 
 
 For example, the rule below named `not_reserved` will look for the `validateNotReserved` method. The rule is considered to fail if anything other than null (ie, an error message) is returned. If an error message is returned, that is what will be returned in the request response.
+
+When using model rules, simply specify the field as 'model'. The corresponding validation method will receive the full payload as it's `$value`, allowing for more complex validations to be performed.
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -116,7 +161,11 @@ class Foo extends Model
     }
 
     public function validateCombinedLength($field, $value, $params) {
-        if (strlen($value[$params[0]]) + strlen($value[$params[1]]) > $params[2])
+        $val1 = $value[$params[0]];
+        $val2 = $value[$params[1]];
+        $maxLen = $params[2];
+        $combinedLen = strlen($val1) + strlen($val2];
+        if ($combinedLen > $maxLen)
           return 'Combined length too long';
     }
 }
@@ -129,10 +178,22 @@ Other points to mention for custom validation rules:
 - similarly, when updating a model, any custom validation methods may make reference to `$this`, which refers to the model itself
 - the `$params` parameter refers to the parameters (an array) to be passed from the rule definitions (ie: `'foo:bar,baz'`). If no params are passed, then this array will be empty
 
-## Contributing
+<br>
+
+Tests
+============
+Run `vendor/bin/phpunit` to run the tests.
+
+<br>
+
+Contributing
+============
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
+Please make sure to update tests appropriately.
 
-## License
+<br>
+
+License
+=======
 [MIT](https://choosealicense.com/licenses/mit/)
