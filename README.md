@@ -1,22 +1,23 @@
+<!--- https://jbt.github.io/markdown-editor/ --->
+
 Introduction
 =================
-RestEasy is a PHP [trait](https://www.php.net/manual/en/language.oop5.traits.php) for [Laravel](https://laravel.com/) [Controllers](https://laravel.com/docs/7.x/controllers), to ensure simpler, more secure REST APIs. The aim is to **heavily** reduce [boilerplate](https://stackoverflow.com/a/3992211/1985175) code, whilst enabling fine-grained control over validation, security, permissions, access-control, and [much more](#features-at-a-glance).
+[RestEasy](https://github.com/ROTGP/rest-easy) is a PHP [trait](https://www.php.net/manual/en/language.oop5.traits.php) for [Laravel](https://laravel.com/) [Controllers](https://laravel.com/docs/7.x/controllers), to ensure simpler, more secure REST APIs. The aim is to **heavily** reduce [boilerplate](https://stackoverflow.com/a/3992211/1985175) code, whilst enabling fine-grained control over validation, permissions, querying, and [much more](#features-at-a-glance).
 
 It implements and encourages [object-oriented design](https://en.wikipedia.org/wiki/Object-oriented_design), and has zero-dependencies (apart from [Laravel](https://laravel.com/) itself).
 
 It is designed to be non-invasive — simply remove the trait from your controller to return to standard Laravel functionality. There's no need to extend, implement or subclass any code.
 
-<br>
 
 
 Why?
 ===
 
-I got tired of rewriting the same boilerplate code every time I started a new Laravel project, or even a new model/controller. It became too much code to maintain, for seemingly repetitive funcionality. 
+I got tired of rewriting the same boilerplate code every time I started a new Laravel project, or even a new model/controller. It became too much code to maintain, for seemingly repetitive functionality. 
 
-Security, authentication, and access-control were also a concern — Laravel provides great mechanisms but it requires you to implement them explicitly, which again results in a lot of codebase to manage.
+Permissions were also a concern — Laravel provides great mechanisms but it requires you to implement them explicitly, which again results in a lot of code to manage.
 
-<br>
+
 
 
 Table of contents
@@ -37,10 +38,36 @@ Features at a glance
 ====================
 
 * Validation
+  * All `PUT` and `POST` requests are automatically validated
+  * `unique` & `exists` rules are completed according to request type (`PUT` or `POST`) (with id, model, table, etc)
+  * Easy custom rules
+  * Model rules (validate the model as a whole, not just individual fields)
+  * Define `immutableFields` – fields which can't be modified for `PUT` requests. These fields will not be validated when updating
+  * Payload pruning and merging - only (normalised) fillable fields will be validated. Only aforementioned fillable fields will be passed to the model for update/create.
+  * PATCH-like functionality – when updating a model, fields missing from the payload will be filled with existing model data, so as to satisfy validation requirements
+  * 
 * Permissions
+  * Simple and implicit model-based validation rules based on eloquent events and the `authUser`. You don't need to explicity ask for permission — if a permission is violated then the request is aborted. Additionally, if the violation happens during an `POST`, `PUT`, or `DELETE` request then it will be automatically wrapped in a transaction
+  * Define permissions for read / write / create / delete / attach / detach
+  * Graceful automatic error response
+  * Object-oriented definitions — define rules in base classes
+  * Enable/disable permissions per-controller, and opt in/out of explicit permissions (if explicit (the default), then the permission method must be defined in the model, and the absence of said method will be interpreted as denial
+  * Easy error responses. Optionally define your error class containing your codes. If you return an integer as a permission response, then the response will automatically return a detailed message
+  * Easy permission exception logging, with detailed information of the violation
 * Querying
+  * Define `safeRelationships` – model relationships which can be queried using the `with` `GET` variable (works with all request types except `DELETE`)
+  * Define safeScopes – scopes which can be queried using GET variables for `index/list` requests
+  * Auto-pagination (really). Just define `page` and `page_size` `GET` variables
+  * Custom `selects`
+  * Define implicit scopes using the implicitScope method. This will be implied implicitly to all requests. 
+  * GroupBys
+  * Aggregations
+  * OrderBys (including by multiple fields)
 * Syncing
+  * Attach and detach models easily
+  * Apply permissions for said syncing  
 * Response
+  * Easily translate error responses 
 * Error handling
 
 
@@ -85,7 +112,7 @@ Route::resource('foos', 'FooController')->only([
 <br>
 
 ## Model discovery
-The model associated with the controller is a standard vanilla [eloquent model](https://laravel.com/docs/7.x/eloquent), requiring no special traits. A `FooController` will look for the `Foo` model in several locations of the app namespace. First in the top-level, then in `namespace\Model` or `namespace\Models`. 
+The controller using [RestEasy](https://github.com/ROTGP/rest-easy) works with the associated model, to ascertain validation rules, permissions, and other optional functionality. The model is a standard vanilla [eloquent model](https://laravel.com/docs/7.x/eloquent), requiring no special traits. A `FooController` will look for the `Foo` model in several locations of the app namespace. First in the top-level, then in `namespace\Model` or `namespace\Models`. 
 
 Alternatively, the controller may implement the `modelNamespace` method, which returns either the namespace where the model is defined, or the fully qualified namespace of the model itself. The former is a good solution for base controller classes wanting to define a custom location for models. 
 
@@ -127,12 +154,10 @@ class Foo extends Model
 }
 ```
 
-<br>
 
 #### Unique and exists validations
 Note that, normally, using the [unique](https://laravel.com/docs/7.x/validation#rule-unique) and [exists](https://laravel.com/docs/7.x/validation#rule-exists) rules requires special attention according to whether the model is being created or updated, and requires the table name (or model) to be appended, as well as (in the case of updates) the id of the model being updated. This is all taken care of automatically with RestEasy — just define `unique` or `exists` with no further parameters. However, if you wish to define these rule definitions manually, RestEasy won't interfere.
 
-<br>
 
 #### Custom validation rules
 RestEast also offers easy custom validation rules, as well as model-based rules which take multiple fields (of the model) into account. Simply define a method using the 'validate' + RuleName ([studly](https://laravel.com/docs/7.x/helpers#method-studly-case) case) convention, and refer to it using the rule_name ([camel](https://laravel.com/docs/7.x/helpers#method-fluent-str-camel) case) convention. 

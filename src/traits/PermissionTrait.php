@@ -45,7 +45,7 @@ trait PermissionTrait
 
     protected function startEloquentGuard() : void
     {
-        if ($this->guardModels() !== true)
+        if ($this->guardModels($this->getAuthUser()) !== true)
             return;
         Event::listen('eloquent.*', Closure::fromCallable([$this, 'onModelEvent']));
     }
@@ -62,7 +62,7 @@ trait PermissionTrait
      *
      * @return bool
      */
-    protected function guardModels() : bool
+    protected function guardModels($authUser) : bool
     {
         return true;
     }
@@ -74,7 +74,7 @@ trait PermissionTrait
      *
      * @return bool
      */
-    protected function explicitPermissions() : bool
+    protected function explicitPermissions($authUser) : bool
     {
         return true;
     }
@@ -101,7 +101,7 @@ trait PermissionTrait
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)
             return;
-        $explicitPermissions = $this->explicitPermissions();
+        $explicitPermissions = $this->explicitPermissions($this->getAuthUser());
         // if permission method not defined, and we're not using explicit permissions
         $permissionMethodExists = method_exists($model, $permissionMethodName);
         if (!$permissionMethodExists && !$explicitPermissions)

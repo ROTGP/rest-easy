@@ -104,7 +104,7 @@ trait RestEasyTrait
         $queriedModel->fill($this->payload(true));
         $this->beforeUpdate($queriedModel);
         $noChanges = $queriedModel->isDirty() === false;
-        if ($this->guardModels())
+        if ($this->guardModels($this->getAuthUser()))
             $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
         $this->performValidation($queriedModel);
         $response = DB::transaction(function () use ($queriedModel, $id) {            
@@ -139,7 +139,7 @@ trait RestEasyTrait
         $this->init($request);
         $newModel = new $this->model($this->payload(true));
         $this->beforeCreate($newModel);
-        if ($this->guardModels())
+        if ($this->guardModels($this->getAuthUser()))
             $this->onModelEvent('eloquent.creating: ' . get_class($newModel), [$newModel]);
         $this->performValidation($newModel);
         $response = DB::transaction(function () use ($newModel) {
@@ -170,6 +170,9 @@ trait RestEasyTrait
         $this->init($request);
         $modelToDelete = $this->findModel($id);
         $this->beforeDelete($modelToDelete);
+        // @TODO what happens if deleting causes a cascade,
+        // which in turn causes a permission violation? This
+        // operation should be wrapped in a transaction.
         $modelToDelete->delete();
         return $this->successfulResponse(null);
     }
