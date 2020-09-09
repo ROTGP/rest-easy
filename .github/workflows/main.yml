@@ -1,3 +1,4 @@
+# https://rubenvanassche.com/testing-php-packages-with-github-actions/
 name: Tests (PHP)
 
 on: [push]
@@ -17,6 +18,7 @@ jobs:
 
       - name: Run composer install
         run: composer install -n --prefer-dist
+        run: composer dump-autoload
         env:
           APP_ENV: testing
     
