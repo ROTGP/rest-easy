@@ -7,7 +7,10 @@
     "autoload": {
         "psr-4": {
             "ROTGP\\RestEasy\\": "src"
-        }
+        },
+        "classmap": [
+            "tests/models"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
