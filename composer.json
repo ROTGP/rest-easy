@@ -9,7 +9,8 @@
             "ROTGP\\RestEasy\\": "src"
         },
         "classmap": [
-            "tests/models"
+            "tests/models",
+            "tests/controllers"
         ]
     },
     "autoload-dev": {
