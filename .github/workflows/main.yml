@@ -17,7 +17,7 @@ jobs:
           key: composer-${{ hashFiles('composer.lock') }}
 
       - name: Run composer install
-        run: composer dump-autoload
+        run: composer install -n --prefer-dist
         env:
           APP_ENV: testing
       
