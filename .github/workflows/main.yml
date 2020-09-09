@@ -21,7 +21,10 @@ jobs:
         run: composer dump-autoload
         env:
           APP_ENV: testing
-    
+      
+      - name: Run composer DU
+        run: composer dump-autoload
+        
       - name: Run tests
         run: ./vendor/bin/phpunit
         env:
