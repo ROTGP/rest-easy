@@ -78,7 +78,8 @@ class WithRelationshipsTest extends IntegrationTestCase
         $this->assertArrayHasKey('users', $json);
         $this->assertArrayHasKey('albums', $json);
         // $this->assertCount(3, $json['users']);
-        // $this->assertCount(3, $json['albums']);
+        $this->assertCount(3, $json['albums']);
+        dd($json);
         $this->assertEquals('epic', $json['record_label']['name']);
     }
 
