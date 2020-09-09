@@ -46,8 +46,7 @@ class Artist extends BaseModel
 
     public function safeScopes($authUser)
     {
-        // dd('hmmm depends... ', $authUser->role->name);
-        return ['record_label'];
+        return ['record_labels', 'name_like'];
     }
 
     public function albums()
@@ -65,14 +64,14 @@ class Artist extends BaseModel
         return $this->belongsTo(RecordLabel::class);
     }
 
-    // public function scopeImplicit($query, $authUser, $payload, $queryParams)
-    // {
-    //     $query->where('id', '<', 10);
-    // }
-
-    public function scopeRecordLabel($query, $recordLabelId)
+    public function scopeNameLike($query, $searchTerm)
     {
-        return $query->where('record_label_id', $recordLabelId);
+        return $query->where('name', 'like', "%" . $searchTerm . "%");
+    }
+
+    public function scopeRecordLabels($query, $recordLabelIds)
+    {
+        return $query->whereIn('record_label_id', (array) $recordLabelIds);
     }
 
     public function canRead($authUser)

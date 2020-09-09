@@ -1,28 +1,21 @@
 <?php
 use ROTGP\RestEasy\Test\IntegrationTestCase;
-use ROTGP\RestEasy\Test\Models\User;
 
 class BasicVerbTest extends IntegrationTestCase
 {
     // https://laravel.com/docs/7.x/http-tests#assert-json
     public function testBasicList()
     {
-        $this->actingAs(User::find(1))->get('artists')
+        $this->asUser(1)->get('artists')
             ->assertJsonCount(11)
             ->assertStatus(200);
     }
 
     public function testBasicGet()
     {
-        // $id = 5;
-        // $response = $this->get('artists/' . $id);
-        // $json = $response->decodeResponseJson();
-        // $this->assertEquals($id, $json['id']);
-        // $this->assertEquals('Marta Christiansen', $json['name']);
-        // $response->assertStatus(200);
-
         $id = 5;
-        $this->get('artists/' . $id)
+        $query = 'artists/' . $id;
+        $this->get($query)
             ->assertJsonStructure([
                 'id',
                 'name',
@@ -43,7 +36,8 @@ class BasicVerbTest extends IntegrationTestCase
     public function testBasicUpdate()
     {
         $id = 5;
-        $this->json('PUT', 'artists/' . $id, [
+        $query = 'artists/' . $id;
+        $this->json('PUT', $query, [
             'biography' => 'foo',
             'record_label_id' => 1
             ])
@@ -65,7 +59,8 @@ class BasicVerbTest extends IntegrationTestCase
 
     public function testBasicCreate()
     {
-        $this->json('POST', 'artists', [
+        $query = 'artists';
+        $this->json('POST', $query, [
             'name' => 'fooName',
             'biography' => 'barBiography',
             'record_label_id' => 3,
@@ -89,7 +84,8 @@ class BasicVerbTest extends IntegrationTestCase
     public function testBasicDelete()
     {
         $id = 5;
-        $this->json('DELETE', 'artists/' . $id)
+        $query = 'artists/' . $id;
+        $this->json('DELETE', $query)
             ->assertStatus(204);
 
         $this->get('artists/' . $id)

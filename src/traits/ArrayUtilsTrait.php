@@ -18,6 +18,12 @@ trait ArrayUtilsTrait
 
     protected function toSnakeArray($arr)
     {
+        if ($this->isAssociative($arr)) {
+            $result = [];
+            foreach($arr as $key => $value)
+                $result[Str::snake($key)] = $value;
+            return $result;
+        }
         for($i = 0; $i < sizeof($arr); $i++)
             $arr[$i] = Str::snake($arr[$i]);
         return $arr;
@@ -28,5 +34,11 @@ trait ArrayUtilsTrait
         for($i = 0; $i < sizeof($arr); $i++)
             $arr[$i] = Str::studly($arr[$i]);
         return $arr;
+    }
+
+    protected function isAssociative(array $arr)
+    {
+        if (array() === $arr) return false;
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }

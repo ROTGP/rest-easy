@@ -69,7 +69,6 @@ class Album extends BaseModel
     {
         return true;
     }
-    
 
     public function canDetach($modelToDetach, $authUser)
     {

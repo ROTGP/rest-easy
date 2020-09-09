@@ -6,7 +6,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 {
     public function testThatListWithRelationshipsAndNoAuthUserReturnsNoRelationships()
     {
-        $response = $this->get('artists?with=record_label,users,albums,foo');
+        $query = 'artists?with=record_label,users,albums,foo';
+        $response = $this->get($query);
         $json = $response->decodeResponseJson();
         $response->assertJsonCount(11);
         $response->assertStatus(200);
@@ -19,7 +20,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatListWithRelationshipsAndAuthUserOneReturnsRelationships()
     {
-        $response = $this->actingAs(User::find(1))->get('artists?with=record_label,users,albums,foo');
+        $query = 'artists?with=record_label,users,albums,foo';
+        $response = $this->asUser(1)->get($query);
         $json = $response->decodeResponseJson();
         $entity = $json[0];
         $this->assertArrayHasKey('record_label', $entity);
@@ -32,7 +34,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatListWithRelationshipsAndAuthUserTwoReturnsRelationships()
     {
-        $response = $this->actingAs(User::find(2))->get('artists?with=record_label,users,albums,foo');
+        $query = 'artists?with=record_label,users,albums,foo';
+        $response = $this->asUser(2)->get($query);
         $json = $response->decodeResponseJson();
         $artist = $json[0];
         $this->assertArrayHasKey('record_label', $artist);
@@ -44,7 +47,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatListNotRequestingRelationshipsReturnsNoRelationships()
     {
-        $response = $this->actingAs(User::find(1))->get('artists');
+        $query = 'artists';
+        $response = $this->asUser(1)->get($query);
         $json = $response->decodeResponseJson();
         $artist = $json[0];
         $this->assertArrayNotHasKey('record_label', $artist);
@@ -54,7 +58,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatGetWithRelationshipsAndNoAuthUserReturnsNoRelationships()
     {
-        $response = $this->get('artists/5?with=record_label,users,albums,foo');
+        $query = 'artists/5?with=record_label,users,albums,foo';
+        $response = $this->get($query);
         $json = $response->decodeResponseJson();
         $response->assertJsonCount(7);
         $response->assertStatus(200);
@@ -66,7 +71,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatGetWithRelationshipsAndAuthUserOneReturnsRelationships()
     {
-        $response = $this->actingAs(User::find(1))->get('artists/5?with=record_label,users,albums,foo');
+        $query = 'artists/5?with=record_label,users,albums,foo';
+        $response = $this->asUser(1)->get($query);
         $json = $response->decodeResponseJson();
         $this->assertArrayHasKey('record_label', $json);
         $this->assertArrayHasKey('users', $json);
@@ -78,7 +84,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatGetWithRelationshipsAndAuthUserTwoReturnsRelationships()
     {
-        $response = $this->actingAs(User::find(2))->get('artists/5?with=record_label,users,albums,foo');
+        $query = 'artists/5?with=record_label,users,albums,foo';
+        $response = $this->asUser(2)->get($query);
         $json = $response->decodeResponseJson();
         $this->assertArrayHasKey('record_label', $json);
         $this->assertArrayNotHasKey('users', $json);
@@ -89,7 +96,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatGetNotRequestingRelationshipsReturnsNoRelationships()
     {
-        $response = $this->actingAs(User::find(1))->get('artists/5');
+        $query = 'artists/5';
+        $response = $this->asUser(1)->get($query);
         $json = $response->decodeResponseJson();
         $this->assertArrayNotHasKey('record_label', $json);
         $this->assertArrayNotHasKey('users', $json);
@@ -98,7 +106,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatListRequestingRelationshipsOnModelWithNoSafeRelationshipsMethodDefinedReturnsNoRelationships()
     {
-        $response = $this->get('plays?with=song,user,foo');
+        $query = 'plays?with=song,user,foo';
+        $response = $this->get($query);
         $json = $response->decodeResponseJson();
         $entity = $json[0];
         $this->assertArrayNotHasKey('song', $entity);
@@ -108,7 +117,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatGetRequestingRelationshipsOnModelWithNoSafeRelationshipsMethodDefinedReturnsNoRelationships()
     {
-        $response = $this->get('plays/5?with=song,user,foo');
+        $query = 'plays/5?with=song,user,foo';
+        $response = $this->get($query);
         $entity = $response->decodeResponseJson();
         $this->assertArrayNotHasKey('song', $entity);
         $this->assertArrayNotHasKey('user', $entity);
@@ -118,7 +128,8 @@ class WithRelationshipsTest extends IntegrationTestCase
     public function testThatUpdateWithRelationshipsReturnsRelationships()
     {
         $id = 5;
-        $response = $this->actingAs(User::find(1))->json('PUT', 'artists/' . $id . '?with=record_label,users,albums,foo', [
+        $query = 'artists/' . $id . '?with=record_label,users,albums,foo';
+        $response = $this->asUser(1)->json('PUT', $query, [
             'biography' => 'foo',
             'record_label_id' => 1
             ])
@@ -145,7 +156,8 @@ class WithRelationshipsTest extends IntegrationTestCase
 
     public function testThatCreateWithRelationshipsReturnsRelationships()
     {
-        $response = $this->actingAs(User::find(1))->json('POST', 'artists?with=record_label,users,albums,foo', [
+        $query = 'artists?with=record_label,users,albums,foo';
+        $response = $this->asUser(1)->json('POST', $query, [
             'name' => 'fooName',
             'biography' => 'barBiography',
             'record_label_id' => 3,

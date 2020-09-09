@@ -99,13 +99,14 @@ trait QueryTrait
         $scopes = $this->getSafeScopes();
         if (empty($scopes))
             return;
-        $queryParams = $this->queryParams();
+        $queryParams = $this->toSnakeArray($this->queryParams());
+        if (empty($queryParams))
+            return;
         for ($i = 0; $i < sizeof($scopes); $i++) {
             $scopeKey = Str::snake(substr($scopes[$i], 5));
             if (!array_key_exists($scopeKey, $queryParams))
                 continue;
             $params = $queryParams[$scopeKey];
-            
             if ($params !== null) {
                 // comma-separated array of ints
                 if (preg_match('/^\d+(?:,\d+)*$/', $params) && !ctype_digit($params)) {
@@ -116,8 +117,7 @@ trait QueryTrait
                 // single double
                 } else if (is_numeric($params)) {
                     $params = doubleval($params);
-                } 
-
+                }
                 
                 // else, strings and comma-separated strings should be parsed
                 // manually by the scope accepting the param. The reason for 
@@ -189,6 +189,8 @@ trait QueryTrait
     protected function applyAggregations() : void
     {
         $queryParams = $this->queryParams();
+        if (empty($queryParams))
+            return;
         $columns = $this->getColumns();
         foreach ($this->aggregateFunctions as $aggFunc) {
             if (!array_key_exists($aggFunc, $queryParams))

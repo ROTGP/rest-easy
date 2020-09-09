@@ -119,6 +119,8 @@ trait PermissionTrait
                 ...$params
             );
         }
+
+        // if (!$allowed) dd($allowed, $model, $permissionMethodName);
         
         if ($allowed === true)
             return;

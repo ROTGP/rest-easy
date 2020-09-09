@@ -26,6 +26,8 @@ trait SyncTrait
             return;
         
         $queryParams = $this->queryParams();
+        if (empty($queryParams))
+            return;
         $verbs = ['attach', 'detach', 'sync'];
         foreach ($verbs as $verb) {
             foreach ($safeSyncRelationships as $relationship) {

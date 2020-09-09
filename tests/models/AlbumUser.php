@@ -10,4 +10,9 @@ class AlbumUser extends Pivot
     {
         return true;
     }
+
+    public function canDelete($authUser)
+    {
+        return true;
+    }
 }
