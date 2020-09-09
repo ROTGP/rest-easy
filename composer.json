@@ -6,7 +6,11 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "ROTGP\\RestEasy\\": "src",
+            "ROTGP\\RestEasy\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "ROTGP\\RestEasy\\Test\\": "tests/"
         }
     },
