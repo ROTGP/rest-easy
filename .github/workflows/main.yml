@@ -19,10 +19,6 @@ jobs:
         run: composer install -n --prefer-dist
         env:
           APP_ENV: testing
-
-      - name: Prepare Laravel Application
-        run: |
-          php artisan key:generate
     
       - name: Run tests
         run: ./vendor/bin/phpunit
