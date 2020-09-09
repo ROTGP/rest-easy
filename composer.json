@@ -9,15 +9,17 @@
             "ROTGP\\RestEasy\\": "src"
         },
         "classmap": [
-            "src/traits",
-            "tests/models",
-            "tests/controllers"
+            "src/traits"
         ]
     },
     "autoload-dev": {
         "psr-4": {
             "ROTGP\\RestEasy\\Test\\": "tests/"
-        }
+        },
+        "classmap": [
+            "tests/models",
+            "tests/controllers"
+        ]
     },
     "require-dev": {
         "phpunit/phpunit": "^9.1",

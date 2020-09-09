@@ -20,9 +20,6 @@ jobs:
         run: composer install -n --prefer-dist
         env:
           APP_ENV: testing
-      
-      - name: Run composer DU
-        run: composer dump-autoload
         
       - name: Run tests
         run: ./vendor/bin/phpunit
