@@ -1,44 +1,46 @@
-name: tests
+name: Tests (PHP)
 
-on:
-  push:
-  pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+on: [push]
 
 jobs:
   tests:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        php: [7.4]
-        os: [ubuntu-latest]
-
-    name: PHP${{ matrix.php }} on ${{ matrix.os }}
-
+    name: Run tests
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
-
-      - name: Cache dependencies
+      - name: Cache composer dependencies
         uses: actions/cache@v1
         with:
-          path: ~/.composer/cache/files
-          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v1
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, mysqli, pdo_mysql, bcmath, intl, gd, exif, iconv, imagick
-          coverage: none
+      - name: Run composer install
+        run: composer install -n --prefer-dist
+        env:
+          APP_ENV: testing
 
-      - name: Install dependencies
+      - name: Prepare Laravel Application
         run: |
-          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
-      - name: Execute tests
-        run: vendor/bin/phpunit
+          cp .env.example .env
+          php artisan key:generate
+      - name: Cache yarn dependencies
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Run yarn
+        run: yarn && yarn dev
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
+        env:
+          APP_ENV: testing
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@master
+        if: failure()
+        with:
+          name: Logs
+          path: ./storage/logs
