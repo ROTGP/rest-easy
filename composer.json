@@ -9,6 +9,7 @@
             "ROTGP\\RestEasy\\": "src"
         },
         "classmap": [
+            "src/traits",
             "tests/models",
             "tests/controllers"
         ]
