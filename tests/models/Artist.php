@@ -41,7 +41,7 @@ class Artist extends BaseModel
         if ($userId === null) {
             return [];
         } else if ($userId === 1) {
-            return ['record_label', 'users', 'albums'];
+            return ['record_label', 'users', 'albums', 'genres'];
         } else {
             return ['record_label', 'albums'];
         }
@@ -49,7 +49,10 @@ class Artist extends BaseModel
 
     public function safeScopes($authUser)
     {
-        return ['record_labels', 'name_like'];
+        return [
+            'record_labels',
+            'name_like'
+        ];
     }
 
     public function albums()

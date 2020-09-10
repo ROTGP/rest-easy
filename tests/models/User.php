@@ -16,7 +16,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email', 
+        'password',
     ];
 
     /**
@@ -60,7 +62,11 @@ class User extends Authenticatable
 
     public function immutableFields($authUser)
     {
-        return ['username', 'role_id', 'date_of_birth'];
+        return [
+            'username',
+            'role_id',
+            'date_of_birth'
+        ];
     }
 
     public function safeRelationships($authUser)

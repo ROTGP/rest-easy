@@ -23,7 +23,11 @@ class Song extends BaseModel
 
     public function safeRelationships($authUser)
     {
-        return ['plays', 'album', 'users'];
+        return [
+            'plays',
+            'album',
+            'users'
+        ];
     }
 
     public function plays()
