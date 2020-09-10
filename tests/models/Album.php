@@ -22,14 +22,13 @@ class Album extends BaseModel
             'release_date' => 'required|date',
             'price' => 'sometimes|numeric',
             'purchases' => 'sometimes|integer',
-            'model' => 'album_count:5|genre_limit:4'
+            'model' => 'album_count:5|post[genre_limit]:4'
         ];
     }
 
     public function immutableFields($authUser)
     {
         return [
-            'name',
             'artist_id',
             'release_date',
             'price'
@@ -69,8 +68,6 @@ class Album extends BaseModel
 
     public function validateAlbumCount($field, $value, $params)
     {
-        // dd($this->where('artist_id', $value['artist_id'])->count());
-
         if (request()->method() === 'PUT')
             return;
         $limit = $params[0];

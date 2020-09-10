@@ -150,4 +150,46 @@ class ValidationTest extends IntegrationTestCase
             $json['validation_errors']['model'][1]
         );
     }
+
+    public function testBasicUpdateValidation()
+    {
+        $id = 4;
+        $query = 'albums/' . $id;
+        $response = $this->get($query);
+        $response->assertStatus(200);
+        
+        $originalJson = $response->decodeResponseJson();
+        $json = $originalJson;
+        $json['name'] = 'Harum similique eum doloribus saepe doloremque unde.';
+        $response = $this->json('PUT', $query, $json
+        )->assertStatus(400);
+
+        $json = $response->decodeResponseJson();
+
+        $this->assertArrayHasKey('http_status_code', $json);
+        $this->assertArrayHasKey('http_status_message', $json);
+        $this->assertArrayHasKey('validation_errors', $json);
+
+        $this->assertEquals(400, $json['http_status_code']);
+        $this->assertEquals('Bad Request', $json['http_status_message']);
+        $this->assertCount(1, $json['validation_errors']);
+        $this->assertCount(1, $json['validation_errors']['name']);
+        $this->assertEquals(
+            'The name has already been taken.',
+            $json['validation_errors']['name'][0]
+        );
+
+        // artist_id exists id won't fire because the field is immutable
+        $json = $originalJson;
+        $json['artist_id'] = 1000;
+        $json['name'] = 'foo';
+        $json['purchases'] = 12345;
+        $response = $this->json('PUT', $query, $json
+        )->assertStatus(200);
+
+        $json = $response->decodeResponseJson();
+        $this->assertEquals('foo', $json['name']);
+        $this->assertEquals(2, $json['artist_id']);
+        $this->assertEquals(12345, $json['purchases']);
+    }
 }
