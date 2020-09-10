@@ -22,7 +22,7 @@ class Album extends BaseModel
             'release_date' => 'required|date',
             'price' => 'sometimes|numeric',
             'purchases' => 'sometimes|integer',
-            'model' => 'album_count:5|post[genre_limit]:4'
+            'model' => 'album_count:5|genre_limit:4'
         ];
     }
 
