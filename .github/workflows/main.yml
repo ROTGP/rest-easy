@@ -6,20 +6,24 @@ on: [push]
 jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
+    
     strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macOS-latest]
-        php-versions: ['7.3', '7.4']
+        php-versions: [7.4']
+
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: intl
           ini-values: "post_max_size=256M"
+
       - name: Cache composer dependencies
         uses: actions/cache@v1
         with:
