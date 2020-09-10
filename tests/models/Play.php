@@ -5,7 +5,10 @@ namespace ROTGP\RestEasy\Test\Models;
 class Play extends BaseModel
 {
     protected $fillable = [
-        'song_id', 'user_id', 'streaming_service_id', 'listen_time'
+        'song_id',
+        'user_id',
+        'streaming_service_id',
+        'listen_time'
     ];
 
     // protected $validationRules = [

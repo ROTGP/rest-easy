@@ -5,7 +5,9 @@ namespace ROTGP\RestEasy\Test\Models;
 class Song extends BaseModel
 {
     protected $fillable = [
-        'name', 'album_id', 'length_seconds' 
+        'name',
+        'album_id',
+        'length_seconds' 
     ];
 
     protected $immutable = [

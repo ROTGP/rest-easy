@@ -5,7 +5,10 @@ namespace ROTGP\RestEasy\Test\Models;
 class Artist extends BaseModel
 {
     protected $fillable = [
-        'name', 'biography', 'record_label_id', 'fan_mail_address'
+        'name',
+        'biography',
+        'record_label_id',
+        'fan_mail_address'
     ];
 
     /**
