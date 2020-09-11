@@ -4,22 +4,19 @@ name: Tests (PHP)
 on: [push]
 
 jobs:
-  tests:
-    runs-on: ${{ matrix.operating-system }}
-    
-    strategy:
+  strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macOS-latest]
         php-versions: [7.4']
-
+  tests:
+    runs-on: ${{ matrix.operating-system }}
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
     steps:
       - name: Checkout
-        if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
         uses: actions/checkout@v1
 
       - name: Install PHP
-        if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
@@ -27,20 +24,17 @@ jobs:
           ini-values: "post_max_size=256M"
 
       - name: Cache composer dependencies
-        if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
         uses: actions/cache@v1
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
 
       - name: Run composer install
-        if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
         run: composer install -n --prefer-dist
         env:
           APP_ENV: testing
         
       - name: Run tests
-        if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
         run: ./vendor/bin/phpunit
         env:
           APP_ENV: testing
