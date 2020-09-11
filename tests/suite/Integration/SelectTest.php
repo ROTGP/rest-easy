@@ -4,7 +4,7 @@ use ROTGP\RestEasy\Test\Models\User;
 
 class SelectTest extends IntegrationTestCase
 {
-    public function testSimpleGetSelect()
+    public function testGetSelect()
     {
         $query = 'artists/1';
         $response = $this->get($query);
@@ -30,7 +30,7 @@ class SelectTest extends IntegrationTestCase
         $this->assertEquals(7, $json['record_label_id']);
     }
 
-    public function testSimpleListSelect()
+    public function testListSelect()
     {
         $query = 'artists';
         $this->get($query)
@@ -41,7 +41,7 @@ class SelectTest extends IntegrationTestCase
                 'record_label_id',
                 'fan_mail_address'
             ]]
-        ) ->assertStatus(200);
+        )->assertStatus(200);
 
         $query = 'artists?select=name,record_label_id';
         $this->get($query)
@@ -50,6 +50,6 @@ class SelectTest extends IntegrationTestCase
                 'name',
                 'record_label_id'
             ]]
-        ) ->assertStatus(200);
+        )->assertStatus(200);
     }
 }

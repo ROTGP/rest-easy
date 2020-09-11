@@ -151,7 +151,7 @@ class ValidationTest extends IntegrationTestCase
         );
     }
 
-    public function testBasicUpdateValidation()
+    public function testUpdateValidation()
     {
         $id = 4;
         $query = 'albums/' . $id;

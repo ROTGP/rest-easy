@@ -11,6 +11,7 @@ use ROTGP\RestEasy\Test\Controllers\ArtistController;
 
 class UnitTest extends TestCase
 {
+    // @TODO remove this
     public function testFoo()
     {
         // $this->expectException(\Illuminate\Database\QueryException::class);
