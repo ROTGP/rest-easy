@@ -1,10 +1,10 @@
 # https://rubenvanassche.com/testing-php-packages-with-github-actions/
-name: Tests (master)
+name: Tests (develop)
 
 on:
   push:
     branches:
-      - master
+      - '!master'
 
 jobs:
   tests:
@@ -12,7 +12,7 @@ jobs:
     
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
+        operating-system: [ubuntu-latest]
         php-versions: [7.4']
 
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
