@@ -45,9 +45,9 @@ jobs:
         env:
           APP_ENV: testing
 
-      - name: Upload artifacts
-        if: (github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest') && failure())
-        uses: actions/upload-artifact@master
-        with:
-          name: Logs
-          path: ./storage/logs
+      # - name: Upload artifacts
+      #   if: (github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest') && failure())
+      #   uses: actions/upload-artifact@master
+      #   with:
+      #     name: Logs
+      #     path: ./storage/logs
