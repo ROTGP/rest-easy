@@ -1,17 +1,21 @@
 # https://rubenvanassche.com/testing-php-packages-with-github-actions/
-name: Tests (PHP)
+name: Tests (Master)
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
-  strategy:
+  tests:
+    runs-on: ${{ matrix.operating-system }}
+    
+    strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macOS-latest]
         php-versions: [7.4']
-  tests:
-    runs-on: ${{ matrix.operating-system }}
+
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
-    if: github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest')
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -38,10 +42,3 @@ jobs:
         run: ./vendor/bin/phpunit
         env:
           APP_ENV: testing
-
-      # - name: Upload artifacts
-      #   if: (github.ref == 'refs/heads/master' || (github.ref != 'refs/heads/master' && matrix.os == 'ubuntu-latest') && failure())
-      #   uses: actions/upload-artifact@master
-      #   with:
-      #     name: Logs
-      #     path: ./storage/logs
