@@ -13,7 +13,7 @@ jobs:
         php-versions: [7.4']
 
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
-    if: github.ref == 'refs/heads/master'
+    if: matrix.os == 'ubuntu-latest'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
