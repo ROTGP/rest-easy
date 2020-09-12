@@ -30,6 +30,11 @@ class Song extends BaseModel
         ];
     }
 
+    public function safeScopes($authUser)
+    {
+        return ['longer_than'];
+    }
+
     public function plays()
     {
         return $this->hasMany(Play::class);
@@ -50,14 +55,22 @@ class Song extends BaseModel
         $authUserId = optional(auth()->user())->id;
         if ($authUserId === null) 
             return;
-        $query->whereHas('users', function ($q) use ($authUserId) {
-            // dd($authUserId);
-            $q->where('song_user.user_id', $authUserId); 
-            // dd($q->toSql()); 
+        $query->whereHas('users', function ($query1) use ($authUserId) {
+            $query1->where('song_user.user_id', $authUserId); 
         });
     }
 
+    public function scopeLongerThan($query, $value)
+    {
+        $query->where('length_seconds', '>', $value);
+    }
+
     public function canRead($authUser)
+    {
+        return true;
+    }
+
+    public function canUpdate($authUser)
     {
         return true;
     }
