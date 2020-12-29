@@ -56,7 +56,7 @@ trait ResponseTrait
         return ucfirst(strtolower(str_replace('_', ' ', $errorKey)));
     }
 
-    protected function findErrorKey ($errorCode)
+    protected function findErrorKey($errorCode)
     {
         if ($errorCode === 0 ||
             !is_int($errorCode) ||
