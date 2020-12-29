@@ -13,7 +13,7 @@ trait ArrayUtilsTrait
     {
         for($i = 0; $i < sizeof($arr); $i++)
             $arr[$i] = Str::camel($arr[$i]);
-        return $arr;
+        return $arr; 
     }
 
     protected function toSnakeArray($arr)
