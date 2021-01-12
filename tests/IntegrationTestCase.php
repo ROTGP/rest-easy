@@ -5,12 +5,12 @@ namespace ROTGP\RestEasy\Test;
 use ROTGP\RestEasy\Test\Models\User;
 
 use Illuminate\Support\Facades\Auth;
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Route;
 
 class IntegrationTestCase extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     /**
      * Setup the test environment.
@@ -19,13 +19,15 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        $this->artisan('migrate:refresh', ['--database' => 'testbench']);
+        // $this->artisan('migrate:refresh', ['--database' => 'testbench']);
         // $this->refreshInMemoryDatabase(); 
     }
 
     protected function tearDown(): void
     {
-        // $this->artisan('migrate:fresh', ['--database' => 'testbench']);
+        // $this->artisan('db:wipe', ['--database' => 'testbench']);
+        // $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        // $this->artisan('migrate:refresh', ['--database' => 'testbench']);
         // $this->resetController();
         Auth::logout();
         parent::tearDown();
