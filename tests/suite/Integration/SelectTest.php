@@ -19,12 +19,12 @@ class SelectTest extends IntegrationTestCase
         );
         $this->assertEquals(7, $json['record_label_id']);
 
-        // @TODO why does this return id when it has not been requested?
         $query = 'artists/1?select=name,record_label_id';
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
-        $this->assertArrayHasKey('name', $json);
+        $this->assertArrayNotHasKey('id', $json);
         $this->assertArrayNotHasKey('biography', $json);
+        $this->assertArrayHasKey('name', $json);
         $this->assertArrayHasKey('record_label_id', $json);
         $this->assertEquals('Ellis Wyman', $json['name']);
         $this->assertEquals(7, $json['record_label_id']);
@@ -46,7 +46,6 @@ class SelectTest extends IntegrationTestCase
         $query = 'artists?select=name,record_label_id';
         $this->get($query)
             ->assertJsonStructure([[
-                'id',
                 'name',
                 'record_label_id'
             ]]

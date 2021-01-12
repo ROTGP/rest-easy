@@ -248,9 +248,6 @@ trait QueryTrait
         );
         if (sizeof($selects) === 0)
             return;
-        $primaryKeyName = $this->model->getKeyName();
-        if (!in_array($primaryKeyName, $selects))
-            array_unshift($selects, $primaryKeyName);
         $this->query->select($selects);
     }
 

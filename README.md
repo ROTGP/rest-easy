@@ -43,7 +43,8 @@ Features at a glance
   * Easy custom rules
   * Model rules (validate the model as a whole, not just individual fields)
   * Define `immutableFields` – fields which can't be modified for `PUT` requests. These fields will not be validated when updating
-  * Payload pruning and merging - only (normalised) fillable fields will be validated. Only aforementioned fillable fields will be passed to the model for update/create.
+  * Payload pruning and merging - only (normalised) fillable fields will be validated.
+  *  Only aforementioned fillable fields will be passed to the model for update/create.
   * PATCH-like functionality – when updating a model, fields missing from the payload will be filled with existing model data, so as to satisfy validation requirements
   * 
 * Permissions
