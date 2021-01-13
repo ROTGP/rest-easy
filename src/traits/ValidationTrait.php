@@ -21,17 +21,15 @@ trait ValidationTrait
             $model,
             'validationRules',
             ...[$this->getAuthUser(),
-            optional($model)->id]
+            optional($model)->getKey()]
         ) ?? [];
         $modelRules = [];
         foreach ($rules as $key => $value) {
             $parts = explode('|', $value);
             for ($i = 0; $i < sizeof($parts); $i++) {
                 if (strtolower($parts[$i]) === 'unique') {
-                    // see https://laravel.com/docs/7.x/validation#introduction
                     $parts[$i] = 'unique:' . get_class($this->model) . ',' . $key;
-                    // @TODO id should be: $key = optional($model)->getKey();
-                    $id = optional($model)->id;
+                    $id = optional($model)->getKey();
                     if (is_int($id)) $parts[$i] .= ',' . $id;
                 } else if (strtolower($parts[$i]) === 'exists') {
                     if (Str::endsWith($key, '_id') === false)

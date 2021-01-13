@@ -181,10 +181,10 @@ trait PermissionTrait
         $data['error_message'] = $errorKey ===  null ? null : ucfirst(strtolower(str_replace('_', ' ', $errorKey)));
         $data['auth_user_id'] = $authUser->id;        
         $data['model'] = get_class($model);
-        $data['model_id'] = optional($model)->id;
+        $data['model_key'] = optional($model)->getKey();
         if ($secondaryModel !== null) {
             $data['secondary_model'] = get_class($secondaryModel);
-            $data['secondary_model_id'] = optional($secondaryModel)->id;
+            $data['secondary_model_key'] = optional($secondaryModel)->getKey();
         }
         $verb = $this->eventActions[$event];
         $message = $authUser->id === null ? 'Unauthenticated user' : 'Authenticated user with id ' . $authUser->id;
