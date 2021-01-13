@@ -28,7 +28,7 @@ trait ResponseTrait
         throw new Exception('Unsupported request method');
     }
 
-    protected function errorResponse($errorCode = null, int $httpStatusCode, $extras = []) : void
+    protected function errorResponse($errorCode = null, int $httpStatusCode = 500, $extras = []) : void
     {
         if (!is_int($httpStatusCode))
             throw new Exception('HTTP status code is required');
