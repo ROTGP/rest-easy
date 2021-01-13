@@ -56,6 +56,18 @@ trait RestEasyTrait
     {
         $this->init($request);
         $response = $this->applyQueryFilters();
+
+        // when listing and no models are returned
+        // permission may be denied however it won't
+        // be fired - so we simulate a read event
+        if (is_a($response, Collection::class) && 
+            $response->count() == 0 &&
+            $this->guardModels($this->getAuthUser()))
+                $this->onModelEvent(
+                    'eloquent.retrieved: ' . get_class($this->model),
+                    [$this->model]
+                );
+
         return $this->successfulResponse($response);
     }
 

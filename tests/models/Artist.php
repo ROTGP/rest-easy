@@ -84,7 +84,7 @@ class Artist extends Model
 
     public function canRead($authUser)
     {
-        return true;
+        return $authUser->id !== 3;
     }
 
     public function canUpdate($authUser)

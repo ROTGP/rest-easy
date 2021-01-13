@@ -189,4 +189,20 @@ class PermissionsTest extends IntegrationTestCase
         $response = $this->asUser(1)->json('POST', $query, ['Foo' => 'bar']);
         $this->assertForbidden($response);
     }
+
+    public function testPermissionIsDeniedWhenListingAndNoModelsAreAccessedAndPermissionIsNotGranted()
+    {
+        $ids = '1,2,3,4,5,6,7,8,9,10,11';
+        $query = 'artists/' . $ids;
+        $response = $this->json('DELETE', $query);
+        $json = $this->decodeResponse($response);
+        
+        $response = $this->asUser(3)->json('GET', 'artists');
+        $this->assertForbidden($response);
+
+        $response = $this->asUser(2)->json('GET', 'artists');
+        $response->assertStatus(200);
+        $json = $this->decodeResponse($response);
+        $this->assertCount(0, $json);
+    }
 }
