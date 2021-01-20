@@ -1,7 +1,6 @@
 <?php
 
 use ROTGP\RestEasy\Test\IntegrationTestCase;
-use Event;
 
 class HooksTest extends IntegrationTestCase
 {

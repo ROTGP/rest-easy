@@ -19,6 +19,7 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        $this->artisan('migrate:refresh', ['--database' => 'testbench']);
     }
 
     protected function tearDown(): void

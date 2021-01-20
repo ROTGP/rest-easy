@@ -23,7 +23,6 @@ trait QueryTrait
         $this->applySelects();
         $this->applyWiths();
         if ($id !== null) {
-            // @TODO beforeGet is never called if there are no query params
             $model = $this->query->get();
             $this->beforeGet($model);
             return $model;
