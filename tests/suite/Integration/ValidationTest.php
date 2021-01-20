@@ -58,7 +58,6 @@ class ValidationTest extends IntegrationTestCase
         );
         $response->assertStatus(400);
         $json = $this->decodeResponse($response);
-        // dd($json);
 
         $this->assertArrayHasKey('http_status_code', $json);
         $this->assertArrayHasKey('http_status_message', $json);
