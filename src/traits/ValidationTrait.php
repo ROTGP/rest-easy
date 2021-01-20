@@ -88,8 +88,6 @@ trait ValidationTrait
         {
             foreach ($customFieldRules as $rule) {
                 $field = $rule['field'];
-                // @TODO if the field being validated is immutable, and we're PUTing,
-                // then do not perform the validation.
                 $payload = $prunedPayload[$field] ?? null;
                 
                 $invocationParams = [$field, $payload, $rule['params']];

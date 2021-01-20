@@ -47,16 +47,21 @@ trait MetaTrait
     protected function getFillable($queriedModel = null) : array
     {
         $fillable = $this->model->getFillable() ?? [];
-        $immutableFields = $this->callProtectedMethod(
-            $this->queriedModel(),
-            'immutableFields',
-            $this->getAuthUser()
-        ) ?? [];
+        $immutableFields = $this->getImmutableFields();
         return $this->method === 'put' ? 
             array_diff(
                 $fillable,
                 $immutableFields,
             ) : $fillable;
+    }
+
+    public function getImmutableFields() : array
+    {
+        return $this->callProtectedMethod(
+            $this->queriedModel(),
+            'immutableFields',
+            $this->getAuthUser()
+        ) ?? [];
     }
 
     public function getColumns() : array
