@@ -42,7 +42,7 @@ trait RequestTrait
                         $this->queriedModel(),
                         $ruleName,
                         $payload[$field]
-                    );                 
+                    );
                 }
             }
         }

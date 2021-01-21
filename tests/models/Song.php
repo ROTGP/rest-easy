@@ -67,6 +67,11 @@ class Song extends Model
         $query->where('length_seconds', '>', $value);
     }
 
+    public function canCreate($authUser)
+    {
+        return true;
+    }
+
     public function canRead($authUser)
     {
         return true;

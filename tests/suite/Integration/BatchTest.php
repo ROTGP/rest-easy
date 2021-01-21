@@ -2,12 +2,7 @@
 use ROTGP\RestEasy\Test\IntegrationTestCase;
 
 class BatchTest extends IntegrationTestCase
-{
-    public function testTrue()
-    {
-        $this->assertTrue(true);
-    }
-    
+{    
     public function testBatchGet()
     {
         $ids = '33,2';
@@ -147,5 +142,65 @@ class BatchTest extends IntegrationTestCase
         $this->assertEquals(111, $json[99]['id']);
         $this->assertEquals('bio99', $json[99]['biography']);
         $this->assertEquals('island_def_jam', $json[99]['record_label']['name']);
+    }
+
+    public function testBatchCreateWithErrorAndTheTransactionRollsBack()
+    {
+        $query = 'artists?with=record_label';
+        $response = $this->asUser(1)->json('POST', $query, [
+            [
+                'name' => 'fooName1',
+                'biography' => 'bio1',
+                'record_label_id' => 3
+            ],
+            [
+                'name' => 'fooName2',
+                'biography' => 'bio2',
+                'record_label_id' => 200 // trigger validation error with bad id
+            ],
+            [
+                'name' => 'fooName3',
+                'biography' => 'bio3',
+                'record_label_id' => 1
+            ]
+        ]);
+        $response->assertStatus(400);
+        $json = $this->decodeResponse($response);
+        
+        $id = 12;
+        $query = 'artists/' . $id;
+        $response = $this->get($query)
+            ->assertJsonStructure([
+                'http_status_code',
+                'http_status_message',
+                'resource_id'
+            ])
+            ->assertJsonFragment([
+                'http_status_code' => 404,
+                'http_status_message' => 'Not Found',
+                'resource_id' => $id
+            ])
+            ->assertStatus(404);
+        
+        $query = 'artists?with=record_label';
+        $response = $this->asUser(1)->json('POST', $query, [
+            [
+                'name' => 'fooName1',
+                'biography' => 'bio1',
+                'record_label_id' => 3
+            ]]);
+        $json = $this->decodeResponse($response);
+        $this->assertCount(1, $json);
+        $this->assertEquals(12, $json[0]['id']);
+        $this->assertEquals('bio1', $json[0]['biography']);
+
+        $response = $this->asUser(1)->json('POST', $query, [
+            'name' => 'fooName2',
+            'biography' => 'bio2',
+            'record_label_id' => 3
+        ]);
+        $json = $this->decodeResponse($response);
+        $this->assertEquals(13, $json['id']);
+        $this->assertEquals('bio2', $json['biography']);
     }
 }

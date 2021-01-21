@@ -47,12 +47,17 @@ trait RestEasyTrait
         $this->startEloquentGuard();
     }
 
+    public function index(Request $request)
+    {
+        return $this->_index($request);
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function _index(Request $request)
     {
         $this->init($request);
         $response = $this->applyQueryFilters();
@@ -76,13 +81,18 @@ trait RestEasyTrait
         //
     }
 
+    public function show(Request $request, $resource)
+    {
+        return $this->_show($request, $resource);
+    }
+
     /**
      * Display the specified resource.
      *
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $resource)
+    public function _show(Request $request, $resource)
     {
         $this->init($request);
         $ids = $this->parseIds($resource);
@@ -115,6 +125,12 @@ trait RestEasyTrait
         //
     }
 
+
+    public function update(Request $request, $resource)
+    {
+        return $this->_update($request, $resource);
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -122,7 +138,7 @@ trait RestEasyTrait
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $resource)
+    public function _update(Request $request, $resource)
     {
         $this->init($request);
         $ids = $this->parseIds($resource);
@@ -204,13 +220,18 @@ trait RestEasyTrait
         //
     }
 
+    public function store(Request $request)
+    {
+        return $this->_store($request);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function _store(Request $request)
     {   
         $this->init($request);
 
@@ -277,13 +298,18 @@ trait RestEasyTrait
         //
     }
 
+    public function destroy(Request $request, $resource)
+    {
+        return $this->_destroy($request, $resource);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $resource)
+    public function _destroy(Request $request, $resource)
     {
         $this->init($request);
         DB::transaction(function () use ($resource) {

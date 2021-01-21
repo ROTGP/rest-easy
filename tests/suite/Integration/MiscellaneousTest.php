@@ -27,4 +27,18 @@ class MiscellaneousTest extends IntegrationTestCase
             ])
             ->assertStatus(200);
     }
+
+    public function testOverridingControllerMethod()
+    {
+        $query = 'songs';
+        $response = $this->json('POST', $query, [
+            'name' => 'fooName',
+            'album_id' => 1,
+            'length_seconds' => 30,
+            ]);
+
+        $json = $this->decodeResponse($response);
+        $this->assertEquals(137, $json['id']);
+        $this->assertEquals('bar', $json['foo']);
+    }
 }
