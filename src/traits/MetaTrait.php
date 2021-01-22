@@ -16,6 +16,7 @@ trait MetaTrait
 {      
     protected $modelMethods;
     protected $columns;
+    protected $queriedModel;
 
     protected function authUser()
     {
@@ -80,6 +81,19 @@ trait MetaTrait
         $property = $reflection->getProperty($prop);
         $property->setAccessible(true);
         return $property->getValue($obj) ?? [];
+    }
+
+    protected function findModel($id, bool $disableEvents = false) : Model
+    {
+        if ($disableEvents)
+            $this->disableListening();
+        $model = $this->model->find($id);
+        if ($disableEvents)
+            $this->enableListening();
+        if ($model === null)
+            $this->errorResponse(null, Response::HTTP_NOT_FOUND, ['resource_id' => $id]);
+        $this->queriedModel = $model;
+        return $this->queriedModel;
     }
 
     protected function queriedModel() : Model
@@ -176,6 +190,22 @@ trait MetaTrait
         }
         $this->modelMethods = $methods;
         return $methods;
+    }
+
+    protected function getModel($id, $returnImmediately = false)
+    {
+        $queriedModel = $this->findModel($id, false);
+        if ($returnImmediately)
+            return $queriedModel;
+        if (empty($this->queryParams())) {
+            $this->beforeGet($queriedModel);
+            return $queriedModel;
+        }   
+        $this->query->where($this->model->getKeyName(), $id);
+        $this->applySyncs($queriedModel, $this->getAuthUser());
+        $model = $this->applyQueryFilters($id)->first();
+        $this->beforeGet($model);
+        return $model;
     }
 
     public function findBatchPayload($id, $payload)

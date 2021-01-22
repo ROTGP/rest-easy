@@ -51,6 +51,7 @@ class ScopesTest extends IntegrationTestCase
         $userId = 1;
         $query = 'songs?with=users';
         $response = $this->asUser($userId)->get($query);
+        $response->assertJsonCount(9);
         $json = $this->decodeResponse($response);
         for ($i = 0; $i < sizeof($json); $i++) {
             $this->assertArrayHasKey('users', $json[$i]);

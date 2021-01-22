@@ -11,21 +11,6 @@ use Str;
 
 trait RequestTrait
 {   
-    protected $queriedModel;
-
-    protected function findModel($id, bool $disableEvents = false) : Model
-    {
-        if ($disableEvents)
-            $this->disableListening();
-        $model = $this->model->find($id);
-        if ($disableEvents)
-            $this->enableListening();
-        if ($model === null)
-            $this->errorResponse(null, Response::HTTP_NOT_FOUND, ['resource_id' => $id]);
-        $this->queriedModel = $model;
-        return $this->queriedModel;
-    }
-
     protected function transform(array $payload) : array
     {
         $transformations = $this->getTransformations();
@@ -67,7 +52,6 @@ trait RequestTrait
             $payload,
             array_flip($this->getFillable())
         );
-        // @TODO this should be cached for prune and non-prune versions
         $payload = $this->transform($payload);
         return $payload;
     }
