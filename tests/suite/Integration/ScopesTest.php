@@ -1,6 +1,7 @@
 <?php
 use ROTGP\RestEasy\Test\IntegrationTestCase;
 use ROTGP\RestEasy\Test\Models\User;
+use ROTGP\RestEasy\Test\Models\Artist;
 
 class ScopesTest extends IntegrationTestCase
 {
@@ -42,7 +43,6 @@ class ScopesTest extends IntegrationTestCase
 
     public function testImplicitScope()
     {
-        $this->setUp();
         $query = 'songs?with=users';
         $response = $this->get($query);
         $response->assertJsonCount(136);

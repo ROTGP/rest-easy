@@ -17,6 +17,13 @@ use ROTGP\RestEasy\Test\Models\Play;
 
 class CreateInitialTables extends Migration
 {
+    private static $fake;
+
+    public static function faker() {
+        if (!isset(self::$fake)) self::$fake = Faker::create();
+        return self::$fake;
+    }
+    
     /**
      * Run the migrations.
      *
@@ -145,45 +152,42 @@ class CreateInitialTables extends Migration
 
     public function seed()
     {
-        $faker = Faker::create();
-        $faker->addProvider(new \Faker\Provider\DateTime($faker));
-        $faker->addProvider(new \Faker\Provider\Miscellaneous($faker));
-        $faker->addProvider(new \Faker\Provider\es_ES\Payment($faker));
-        $faker->addProvider(new \Faker\Provider\en_US\Address($faker));
-        $faker->seed(10);
+        self::faker()->seed(10);
 
         $genres = Genre::all()->toArray();
         $recordLabels = RecordLabel::all()->toArray();
         $streamingServices = StreamingService::all()->toArray();
         
-        foreach (range(0, 10) as $a) {
+        for ($i = 0; $i <= 10; $i++) {
+            
             $artist = new Artist([
-                'name' => $faker->name,
-                'biography' => $faker->paragraph,
-                'record_label_id' => $faker->randomElement($recordLabels)['id']
+                'name' => self::faker()->name,
+                'biography' => self::faker()->paragraph,
+                'record_label_id' => self::faker()->randomElement($recordLabels)['id']
             ]);
-            if ($faker->boolean === true)
-                $artist->fan_mail_address = $faker->address;
+            
+            if (self::faker()->boolean === true)
+                $artist->fan_mail_address = self::faker()->address;
             $artist->save();
 
-            $albumCount = $faker->numberBetween(0, 4);
-            foreach (range(0, $albumCount) as $b) {
+            $albumCount = self::faker()->numberBetween(0, 4);
+            for ($j = 0; $j <= $albumCount; $j++) {
                 $album = new Album([
-                    'name' => $faker->sentence,
+                    'name' => self::faker()->sentence,
                     'artist_id' => $artist->id,
-                    'genre_id' => $faker->randomElement($genres)['id'],
-                    'release_date' => $faker->dateTimeBetween(new DateTime('2000-01-01 00:00'), new DateTime('2020-03-31 00:00'), 'UTC'),
-                    'price' => $faker->numberBetween(1, 30) + ($faker->numberBetween(1, 50) / 100),
-                    'purchases' => $faker->numberBetween(1, 1000)
+                    'genre_id' => self::faker()->randomElement($genres)['id'],
+                    'release_date' => self::faker()->dateTimeBetween(new DateTime('2000-01-01 00:00'), new DateTime('2020-03-31 00:00'), 'UTC'),
+                    'price' => self::faker()->numberBetween(1, 30) + (self::faker()->numberBetween(1, 50) / 100),
+                    'purchases' => self::faker()->numberBetween(1, 1000)
                 ]);
                 $album->save();
 
-                $songCount = $faker->numberBetween(2, 6);
-                foreach (range(0, $songCount) as $c) {
+                $songCount = self::faker()->numberBetween(2, 6);
+                for ($k = 0; $k <= $songCount; $k++) {
                     $song = new Song([
-                        'name' => $faker->sentence,
+                        'name' => self::faker()->sentence,
                         'album_id' => $album->id,
-                        'length_seconds' => $faker->numberBetween(3, 300),
+                        'length_seconds' => self::faker()->numberBetween(3, 300),
                     ]);
                     $song->save();
                 }
@@ -196,31 +200,31 @@ class CreateInitialTables extends Migration
         $userIds = [];
         $streamingServiceIds = StreamingService::all()->pluck('id')->toArray();
 
-        foreach (range(0, 10) as $a) {
+        for ($i = 0; $i <= 10; $i++) {
             $user = new User([
-                'name' => $faker->userName,
-                'email' => $faker->email,
-                'password' => $faker->password
+                'name' => self::faker()->userName,
+                'email' => self::faker()->email,
+                'password' => self::faker()->password
             ]);
-            if ($a % 5 === 0) {
+            if ($i % 5 === 0) {
                 $user->role_id = Role::ADMIN;
             }
             $user->save();
             $userIds[] = $user->id;
  
-            $user->artists()->sync($faker->randomElements($artistIds, $faker->numberBetween(0, 5)));
-            $user->albums()->sync($faker->randomElements($albumIds, $faker->numberBetween(0, 5)));
-            $user->songs()->sync($faker->randomElements($songIds, $faker->numberBetween(0, 10)));
+            $user->artists()->sync(self::faker()->randomElements($artistIds, self::faker()->numberBetween(0, 5)));
+            $user->albums()->sync(self::faker()->randomElements($albumIds, self::faker()->numberBetween(0, 5)));
+            $user->songs()->sync(self::faker()->randomElements($songIds, self::faker()->numberBetween(0, 10)));
         }
 
         foreach ($userIds as $userId) {
-            $playCount = $faker->numberBetween(0, 10);
-            foreach (range(0, $playCount) as $a) {
+            $playCount = self::faker()->numberBetween(0, 10);
+            for ($i = 0; $i <= $playCount; $i++) {
                 $play = new Play([
                     'user_id' => $userId,
-                    'song_id' => $faker->randomElement($songIds),
-                    'streaming_service_id' => $faker->randomElement($streamingServiceIds),
-                    'listen_time' => $faker->dateTimeBetween(new DateTime('2000-01-01 00:00'), new DateTime('2020-03-31 00:00'), 'UTC')
+                    'song_id' => self::faker()->randomElement($songIds),
+                    'streaming_service_id' => self::faker()->randomElement($streamingServiceIds),
+                    'listen_time' => self::faker()->dateTimeBetween(new DateTime('2000-01-01 00:00'), new DateTime('2020-03-31 00:00'), 'UTC')
                 ]);
                 $play->save();
             }

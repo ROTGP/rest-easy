@@ -6,6 +6,7 @@ use ROTGP\RestEasy\Test\Models\User;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Routing\Route;
 
 class IntegrationTestCase extends TestCase
@@ -19,7 +20,6 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        $this->artisan('migrate:refresh', ['--database' => 'testbench']);
     }
 
     protected function tearDown(): void

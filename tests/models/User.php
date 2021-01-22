@@ -95,7 +95,6 @@ class User extends Authenticatable
 
     public function albums()
     {
-        // return $this->belongsToMany(Album::class)->withTimestamps();
         return $this->belongsToMany(Album::class)->using(AlbumUser::class)->withTimestamps();
     }
 
