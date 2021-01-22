@@ -2,15 +2,16 @@
 
 namespace ROTGP\RestEasy\Traits;
 
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 use Event;
 use Closure;
 use Exception;
 use Str;
-use Illuminate\Http\Request;
 use Log;
 use ReflectionClass;
 use App;
-use Carbon\Carbon;
 
 trait PermissionTrait
 {      
@@ -123,9 +124,6 @@ trait PermissionTrait
             $model->{$hookName}();
         if (method_exists($this, $hookName))
             $this->{$hookName}($model);
-
-        // @TODO if retrieving a resource that contains no records, and permission
-        // is NOT granted, an empty array is returned, instead of an error message
         
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)

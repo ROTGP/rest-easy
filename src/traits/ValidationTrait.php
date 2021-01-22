@@ -120,12 +120,6 @@ trait ValidationTrait
 
         if ($validator->fails())
             return $this->translateValidationMessages($validator);
-
-        // if ($validator->fails())
-            // $this->errorResponse(
-            //     null,
-            //     Response::HTTP_BAD_REQUEST,
-            //     ['validation_errors' => $this->translateValidationMessages($validator)]);
     }
 
     protected function translateValidationMessages($validator)
