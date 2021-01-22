@@ -2,9 +2,10 @@
 
 namespace ROTGP\RestEasy\Test\Controllers;
 
-use Illuminate\Routing\Controller;
-
 use ROTGP\RestEasy\RestEasyTrait;
+use ROTGP\RestEasy\Test\ErrorCodes;
+
+use Illuminate\Routing\Controller;
 
 abstract class BaseController extends Controller
 {
