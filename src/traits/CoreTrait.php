@@ -54,12 +54,13 @@ trait CoreTrait
         // be fired - so we simulate a read event
         if (is_a($response, Collection::class) && 
             $response->count() == 0 &&
-            $this->guardModels($this->getAuthUser()))
+            $this->guardModels($this->getAuthUser())) 
                 $this->onModelEvent(
                     'eloquent.retrieved: ' . get_class($this->model),
                     [$this->model]
                 );
-
+    
+        $this->didReadMany($response);
         return $this->successfulResponse($response);
     }
 
@@ -73,12 +74,13 @@ trait CoreTrait
     {
         $this->init($request);
         $ids = $this->parseIds($resource);
-        $models = [];
+        $responseModels = [];
         foreach ($ids as $id)
-            $models[] = $this->getModel($id);
-        return $this->successfulResponse(
-            count($ids) > 1 ? $models : $models[0]
-        );
+            $responseModels[] = $this->getModel($id);
+        $isBatch = count($responseModels) > 1;
+        $responseModels = $isBatch ? $responseModels : $responseModels[0];
+        $isBatch ? $this->didReadMany(collect($responseModels)) : $this->didRead($responseModels);
+        return $this->successfulResponse($responseModels);
     }
 
      /**
@@ -159,6 +161,7 @@ trait CoreTrait
         });
         // dd($this->debugEvents);
         $responseModels = $isBatch ? $responseModels : $responseModels[0];
+        $isBatch ? $this->didUpdateMany(collect($responseModels)) : $this->didUpdate($responseModels);
         return $this->successfulResponse($responseModels);
     }
 
@@ -227,6 +230,7 @@ trait CoreTrait
             return $result;
         });
         $responseModels = $isBatch ? $responseModels : $responseModels[0];
+        $isBatch ? $this->didCreateMany(collect($responseModels)) : $this->didCreate($responseModels);
         return $this->successfulResponse($responseModels);
     }
 
@@ -239,14 +243,19 @@ trait CoreTrait
     public function _destroy(Request $request, $resource)
     {
         $this->init($request);
-        DB::transaction(function () use ($resource) {
+        $responseModels = [];
+        $isBatch = false;
+        DB::transaction(function () use ($resource, &$responseModels, &$isBatch) {
             $ids = $this->parseIds($resource);
+            $isBatch = sizeof($ids) > 1;
             foreach ($ids as $id) {
                 $modelToDelete = $this->findModel($id, true);
                 $this->beforeDelete($modelToDelete);
                 $modelToDelete->delete();
+                $responseModels[] = $modelToDelete;
             }
         });
+        $isBatch ? $this->didDeleteMany(collect($responseModels)) : $this->didDelete($responseModels[0]);
         return $this->successfulResponse(null);
     }
 }

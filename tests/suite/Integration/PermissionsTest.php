@@ -195,7 +195,9 @@ class PermissionsTest extends IntegrationTestCase
         $ids = '1,2,3,4,5,6,7,8,9,10,11';
         $query = 'artists/' . $ids;
         $response = $this->json('DELETE', $query);
+        $response->assertStatus(204);
         $json = $this->decodeResponse($response);
+        // @TODO what's should be asserted here?
         
         $response = $this->asUser(3)->json('GET', 'artists');
         $this->assertForbidden($response);
