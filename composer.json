@@ -27,5 +27,12 @@
     "require": {
         "php": ">=7.3.0",
         "fakerphp/faker": "^1.13"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ROTGP\\AuthSodium\\RestEasyServiceProvider"
+            ]
+        }
     }
 }

@@ -198,23 +198,22 @@ trait MetaTrait
         if ($returnImmediately)
             return $queriedModel;
         if (empty($this->queryParams())) {
-            $this->beforeGet($queriedModel);
+            $this->willGet($queriedModel);
             return $queriedModel;
         }   
         $this->query->where($this->model->getKeyName(), $id);
         $this->applySyncs($queriedModel, $this->getAuthUser());
         $model = $this->applyQueryFilters($id)->first();
-        $this->beforeGet($model);
+        $this->willGet($model);
         return $model;
     }
 
     public function findBatchPayload($id, $payload)
     {
         $keyName = $this->model->getKeyName();
-        foreach ($payload as $pl) {
+        foreach ($payload as $pl)
             if (array_key_exists($keyName, $pl) && $pl[$keyName] == $id)
                 return $pl;
-        }
     }
 
     protected function parseIds($resource)

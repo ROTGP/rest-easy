@@ -24,6 +24,4 @@ class ErrorCodeTest extends IntegrationTestCase
         $this->assertEquals(1, $json['error_code']);
         $this->assertEquals('User not authorized to access album', $json['error_message']);
     }
-
-    // @TODO test that when a message is returned from a perm method, that it is displayed
 }

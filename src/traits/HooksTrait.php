@@ -4,37 +4,38 @@ namespace ROTGP\RestEasy\Traits;
 
 trait HooksTrait
 {  
-    public function beforeList($query)
+    public function willList($query)
     {
         //
     }
 
-    public function beforeGet($model)
+    public function willGet($model)
     {
         //
     }
 
-    public function beforeUpdate($model)
+    public function willUpdate($model)
     {
         //
     }
 
-    public function beforeCreate($newModel)
+    public function willCreate($newModel)
     {
         //
     }
 
-    public function beforeDelete($model)
+    public function willDelete($model)
     {
         //
     }
 
-    public function didRead($model)
+    // @TODO add tests for all 'did' hooks
+    public function didGet($model)
     {
         //
     }
 
-    public function didReadMany($collection)
+    public function didGetMany($collection)
     {
         //
     }
@@ -65,6 +66,51 @@ trait HooksTrait
     }
 
     public function didDeleteMany($collection)
+    {
+        //
+    }
+
+    public function useAfterHooks()
+    {
+        return false;
+    }
+
+    public function didGetAfter($model)
+    {
+        //
+    }
+
+    public function didGetManyAfter($collection)
+    {
+        //
+    }
+
+    public function didUpdateAfter($model)
+    {
+        //
+    }
+
+    public function didUpdateManyAfter($collection)
+    {
+        //
+    }
+
+    public function didCreateAfter($newModel)
+    {
+        //
+    }
+
+    public function didCreateManyAfter($collection)
+    {
+        //
+    }
+
+    public function didDeleteAfter($model)
+    {
+        //
+    }
+
+    public function didDeleteManyAfter($collection)
     {
         //
     }

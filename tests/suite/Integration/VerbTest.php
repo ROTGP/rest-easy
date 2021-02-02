@@ -3,14 +3,6 @@ use ROTGP\RestEasy\Test\IntegrationTestCase;
 
 class VerbTest extends IntegrationTestCase
 {
-    // https://laravel.com/docs/7.x/http-tests#assert-json
-    public function testBasicList()
-    {
-        $this->asUser(1)->get('artists')
-            ->assertJsonCount(11)
-            ->assertStatus(200);
-    }
-
     public function testBasicGet()
     {
         $id = 5;

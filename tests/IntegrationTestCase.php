@@ -20,6 +20,16 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        // echo "\n\n" . $this->getName() . "======> \n";
+    }
+
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     * @return array
+     */
+    protected function getPackageProviders($app)
+    {
+        return ['ROTGP\RestEasy\RestEasyServiceProvider'];
     }
 
     protected function tearDown(): void

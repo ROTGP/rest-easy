@@ -4,6 +4,7 @@ namespace ROTGP\RestEasy\Traits;
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Route;
 
 use Exception;
 use ReflectionClass;
@@ -12,6 +13,7 @@ trait ResponseTrait
 {      
     protected function successfulResponse($response) : Response
     {
+        // echo Route::getCurrentRoute()->getActionMethod();
         return response()->json($response, $this->successfulHttpCode());
     }
 
