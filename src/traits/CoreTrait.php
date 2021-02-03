@@ -182,7 +182,7 @@ trait CoreTrait
             return $result;
         });
         // dd($this->debugEvents);
-        // $responseModels = $isBatch ? $responseModels : $responseModels[0];
+        $responseModels = $isBatch ? $responseModels : $responseModels[0];
         $isBatch ? $this->didUpdateMany(collect($responseModels)) : $this->didUpdate($responseModels);
         // $this->did('Update', $responseModels);
         return $this->successfulResponse($responseModels);
