@@ -24,14 +24,14 @@ trait QueryTrait
         $this->applyWiths();
         if ($id !== null) {
             $model = $this->query->get();
-            $this->willGet($model);
+            $this->will('Get', $model);
             return $model;
         }
         $this->applyScopes();
         $this->applyGroupBy();
         $this->applyAggregations();
         $this->applyOrderBy();
-        $this->willList($this->query);
+        $this->will('List', $this->query);
         return $this->applyPagination($this->query);
     }
 

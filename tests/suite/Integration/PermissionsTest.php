@@ -200,6 +200,7 @@ class PermissionsTest extends IntegrationTestCase
         $this->assertNull($json);
         
         $response = $this->asUser(3)->json('GET', 'artists');
+        $json = $this->decodeResponse($response);
         $this->assertForbidden($response);
 
         $response = $this->asUser(2)->json('GET', 'artists');

@@ -35,17 +35,7 @@ trait HooksTrait
         //
     }
 
-    public function didGetMany($collection)
-    {
-        //
-    }
-
     public function didUpdate($model)
-    {
-        //
-    }
-
-    public function didUpdateMany($collection)
     {
         //
     }
@@ -55,17 +45,7 @@ trait HooksTrait
         //
     }
 
-    public function didCreateMany($collection)
-    {
-        //
-    }
-
     public function didDelete($model)
-    {
-        //
-    }
-
-    public function didDeleteMany($collection)
     {
         //
     }
@@ -80,17 +60,7 @@ trait HooksTrait
         //
     }
 
-    public function didGetManyAfter($collection)
-    {
-        //
-    }
-
     public function didUpdateAfter($model)
-    {
-        //
-    }
-
-    public function didUpdateManyAfter($collection)
     {
         //
     }
@@ -100,17 +70,7 @@ trait HooksTrait
         //
     }
 
-    public function didCreateManyAfter($collection)
-    {
-        //
-    }
-
     public function didDeleteAfter($model)
-    {
-        //
-    }
-
-    public function didDeleteManyAfter($collection)
     {
         //
     }

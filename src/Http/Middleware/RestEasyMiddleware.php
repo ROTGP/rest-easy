@@ -9,18 +9,20 @@ use ROTGP\RestEasy\RestEasyTrait;
 
 class RestEasyMiddleware
 {
-    private $controller;
-    private $hookName;
-    private $hookPayload;
+    private static $controller;
+    private static $hookName;
+    private static $hookPayload = [];
 
     public function handle($request, Closure $next)
     {
-        $this->controller = Route::getRoutes()->match($request)->getController();
+        self::$controller = Route::getRoutes()->match($request)->getController();
+        self::$hookName = null;
+        self::$hookPayload = [];
 
         // https://laravel.com/docs/8.x/helpers#method-class-uses-recursive
-        $usingTrait = in_array(RestEasyTrait::class, class_uses_recursive($this->controller));
+        $usingTrait = in_array(RestEasyTrait::class, class_uses_recursive(self::$controller));
 
-        if ($usingTrait && $this->controller->useAfterHooks())
+        if ($usingTrait && self::$controller->useAfterHooks())
             Event::listen('resteasy.after', Closure::fromCallable([$this, 'afterHook']));
         
         return $next($request);
@@ -34,16 +36,16 @@ class RestEasyMiddleware
      */
     public function terminate($request, $response)
     {
-        // Store the session data...
-        // dd(get_class($request->route()->controller));
-        // echo 'y';
-
-        // dd('yeeeah');
+        if (self::$hookName == null)
+            return;
+        foreach (self::$hookPayload as $model)
+            self::$controller->{self::$hookName . 'After'}($model);
     }
 
-    public function afterHook($foo, $bar)
+    private function afterHook(...$value)
     {
-        dd('here!', $foo);
-        dd($foo, $bar);
+        self::$hookName = $value[0];
+        self::$hookPayload[] = $value[1];
+        return false;
     }
 }

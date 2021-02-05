@@ -2,18 +2,55 @@
 
 namespace ROTGP\RestEasy\Traits;
 
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Route;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
 
+use Route;
 use Exception;
 use ReflectionClass;
+use Str;
 
 trait ResponseTrait
 {      
     protected function successfulResponse($response) : Response
     {
-        // echo Route::getCurrentRoute()->getActionMethod();
+        /**
+         * Now that we have our response and all user-initiated
+         * requests have been resolved, it's safe to disable 
+         * model event listening, so that models can be queried
+         * in did/after hooks.
+         */
+        $this->disableListening();
+
+        $actionMethod = Route::getCurrentRoute()->getActionMethod();
+        $method = Str::studly($this->method);
+        if ($method === 'Index') {
+            $method = 'Get';
+        } else if ($method === 'Post') {
+            $method = 'Create';
+        } else if ($method === 'Put') {
+            $method = 'Update';
+        }
+        $action = 'did' . $method;
+        $didCollection = collect($response);
+    
+        foreach ($didCollection as $model) {
+            // models with no key are excluded, as they're likely aggregates
+            if ((is_a($model, Model::class) && $model->getKey() == null) || !is_a($model, Model::class)) continue;
+            event('resteasy.after', [$action, $model]);
+            $this->{$action}($model);
+        }
+        
+        if ($actionMethod !== 'index' && (is_a($response, Collection::class) || 
+            is_array($response)) && !$this->isBatch && count($response) === 1) {
+            $response = $response[0];
+        }
+
+        if ($method === 'Delete')
+            return response()->json(null, $this->successfulHttpCode());
+
         return response()->json($response, $this->successfulHttpCode());
     }
 

@@ -21,8 +21,8 @@ class AggregationTest extends IntegrationTestCase
         $query = 'songs?avg=length_seconds';
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
-        $this->assertCount(1, $json);
         $this->assertEquals(160.941176470588, $json[0]['length_seconds_avg']);
+
     }
 
     public function testAggregationAverageWithGroupBy()
@@ -81,6 +81,7 @@ class AggregationTest extends IntegrationTestCase
 
     public function testAggregationCount()
     {
+        
         $query = 'songs?count=id';
         $response = $this->get($query);
         $json = $this->decodeResponse($response);

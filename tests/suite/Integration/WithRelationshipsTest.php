@@ -147,6 +147,7 @@ class WithRelationshipsTest extends IntegrationTestCase
             ])
             ->assertStatus(200);
         $json = $response->decodeResponseJson();
+
         $this->assertArrayHasKey('record_label', $json);
         $this->assertArrayHasKey('users', $json);
         $this->assertArrayHasKey('albums', $json);
@@ -181,5 +182,19 @@ class WithRelationshipsTest extends IntegrationTestCase
         $this->assertArrayHasKey('albums', $entity);
         $this->assertArrayNotHasKey('foo', $entity);
         $this->assertEquals('aftermath', $entity['record_label']['name']);
+    }
+
+    public function testWithCount()
+    {
+        $query = 'artists/6?with_count=record_label,users,albums&with=users';
+        $response = $this->asUser(1)->get($query);
+        $artist = $this->decodeResponse($response);
+        $this->assertArrayHasKey('record_label_count', $artist);
+        $this->assertEquals(1, $artist['record_label_count']);
+        $this->assertArrayHasKey('users_count', $artist);
+        $this->assertEquals(3, $artist['users_count']);
+        $this->assertArrayHasKey('albums_count', $artist);
+        $this->assertEquals(2, $artist['albums_count']);
+        $this->assertCount(3, $artist['users']);
     }
 }

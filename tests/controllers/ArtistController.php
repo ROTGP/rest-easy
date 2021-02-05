@@ -34,19 +34,9 @@ class ArtistController extends BaseController
         event('hook.artist.did', ['didGetHook', $model]);
     }
 
-    public function didGetMany($collection)
-    {
-        event('hook.artist.did', ['didGetManyHook', $collection]);
-    }
-
     public function didUpdate($model)
     {
         event('hook.artist.did', ['didUpdateHook', $model]);
-    }
-
-    public function didUpdateMany($collection)
-    {
-        event('hook.artist.did', ['didUpdateManyHook', $collection]);
     }
 
     public function didCreate($model)
@@ -54,23 +44,47 @@ class ArtistController extends BaseController
         event('hook.artist.did', ['didCreateHook', $model]);
     }
 
-    public function didCreateMany($collection)
-    {
-        event('hook.artist.did', ['didCreateManyHook', $collection]);
-    }
-
     public function didDelete($model)
     {
         event('hook.artist.did', ['didDeleteHook', $model]);
     }
 
-    public function didDeleteMany($collection)
-    {
-        event('hook.artist.did', ['didDeleteManyHook', $collection]);
-    }
-
     public function useAfterHooks()
     {
         return true;
+    }
+
+    public function didGetAfter($model)
+    {
+        $this->incrementBiography($model);
+    }
+
+    public function didUpdateAfter($model)
+    {
+        $this->incrementBiography($model);
+    }
+
+    public function didCreateAfter($model)
+    {
+        $this->incrementBiography($model);
+    }
+
+    public function didDeleteAfter($model)
+    {
+        // $this->incrementBiography($model);
+    }
+
+    public function incrementBiography($model)
+    {
+        $biography = $model->biography;
+        $idx = 0;
+        if (preg_match('#(\d+)$#', $biography, $matches)) {
+            $biography = str_replace($matches[1], '' , $biography);
+            $idx = intval($matches[1]);
+        }
+        $idx++;
+        $model->biography = $biography . $idx;
+        $model->save();
+        // echo ' IDX => ' . $idx . "\n";
     }
 }

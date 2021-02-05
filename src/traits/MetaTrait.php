@@ -83,6 +83,13 @@ trait MetaTrait
         return $property->getValue($obj) ?? [];
     }
 
+    protected function will($verb, $payload)
+    {
+        $this->disableListening();
+        $this->{'will' . $verb}($payload);
+        $this->enableListening();
+    }
+
     protected function findModel($id, bool $disableEvents = false) : Model
     {
         if ($disableEvents)
@@ -198,13 +205,13 @@ trait MetaTrait
         if ($returnImmediately)
             return $queriedModel;
         if (empty($this->queryParams())) {
-            $this->willGet($queriedModel);
+            $this->will('Get', $queriedModel);
             return $queriedModel;
         }   
         $this->query->where($this->model->getKeyName(), $id);
         $this->applySyncs($queriedModel, $this->getAuthUser());
         $model = $this->applyQueryFilters($id)->first();
-        $this->willGet($model);
+        $this->will('Get', $model);
         return $model;
     }
 

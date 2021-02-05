@@ -5,12 +5,11 @@ namespace ROTGP\RestEasy\Traits;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Collection;
 
 use DB;
 use ReflectionClass;
-use Str;
 
 trait CoreTrait
 {  
@@ -29,6 +28,7 @@ trait CoreTrait
     protected $query;
     protected $method;
     protected $request;
+    protected $isBatch = false;
 
     protected function init(Request $request) {
         $this->request = $request;
@@ -38,26 +38,6 @@ trait CoreTrait
         $this->method = strtolower($this->request->getMethod());
         $this->modelNamespace = (new ReflectionClass($this->model))->getNamespaceName();
         $this->startEloquentGuard();
-    }
-
-    protected function did($verb, $payload)
-    {
-        $action = '';
-
-        if (is_a($payload, Collection::class) && count($payload) === 1)
-            $payload = $payload->first();
-        
-        if (is_subclass_of($payload, Model::class)) {
-            $action = 'did' . $verb;
-        } else if (is_a($payload, Collection::class)) {
-            // normalize collection type to Illuminate\Support\Collection
-            $payload = collect($payload);
-            $action = 'did' . $verb . 'Many';
-        } else {
-            return;
-        }
-        
-        $this->{$action}($payload);
     }
 
     /**
@@ -80,8 +60,7 @@ trait CoreTrait
                     'eloquent.retrieved: ' . get_class($this->model),
                     [$this->model]
                 );
-    
-        $this->did('Get', $response);
+        
         return $this->successfulResponse($response);
     }
 
@@ -98,10 +77,6 @@ trait CoreTrait
         $responseModels = [];
         foreach ($ids as $id)
             $responseModels[] = $this->getModel($id);
-        $isBatch = count($responseModels) > 1;
-        $responseModels = $isBatch ? $responseModels : $responseModels[0];
-        $isBatch ? $this->didGetMany(collect($responseModels)) : $this->didGet($responseModels);
-        $this->did('Get', $responseModels);
         return $this->successfulResponse($responseModels);
     }
 
@@ -117,11 +92,11 @@ trait CoreTrait
         $this->init($request);
         $ids = $this->parseIds($resource);
         $payload = $this->request->json()->all();
-        $isBatch = !$this->isAssociative($payload);
+        $this->isBatch = !$this->isAssociative($payload);
         $queriedModels = [];
         
         foreach ($ids as $id) {
-            if ($isBatch) {
+            if ($this->isBatch) {
                 $queriedModel = $this->findModel($id, true);
                 $pl = $this->findBatchPayload($id, $payload);
                 if ($pl == null)
@@ -135,12 +110,11 @@ trait CoreTrait
             }
         }
         
-        $responseModels = DB::transaction(function () use ($queriedModels, $isBatch) {
+        $responseModels = DB::transaction(function () use ($queriedModels) {
             $validationErrorCollection = [];
             $hasValidationErrors = false;
             $result = [];
             foreach ($queriedModels as $queriedModel) {
-                $this->willUpdate($queriedModel);
                 if ($this->guardModels($this->getAuthUser()))
                     $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
                 
@@ -155,6 +129,8 @@ trait CoreTrait
                 if ($hasValidationErrors)
                     continue;
 
+                $this->will('Update', $queriedModel);
+
                 $queriedModel->save();
                 $this->disableListening();
                 $queriedModel->refresh();
@@ -164,7 +140,7 @@ trait CoreTrait
                     continue;
                 }
                 // reset query, in case we're batching
-                if ($isBatch)
+                if ($this->isBatch)
                     $this->query = $this->model->query();
                 $this->applySyncs($queriedModel, $this->getAuthUser());
                 
@@ -173,7 +149,7 @@ trait CoreTrait
             }
 
             if ($hasValidationErrors) {
-                $validationErrors = $isBatch ? $validationErrorCollection : $validationErrorCollection[0];
+                $validationErrors = $this->isBatch ? $validationErrorCollection : $validationErrorCollection[0];
                 $this->errorResponse(
                     null,
                     Response::HTTP_BAD_REQUEST,
@@ -182,9 +158,6 @@ trait CoreTrait
             return $result;
         });
         // dd($this->debugEvents);
-        $responseModels = $isBatch ? $responseModels : $responseModels[0];
-        $isBatch ? $this->didUpdateMany(collect($responseModels)) : $this->didUpdate($responseModels);
-        // $this->did('Update', $responseModels);
         return $this->successfulResponse($responseModels);
     }
 
@@ -199,21 +172,20 @@ trait CoreTrait
         $this->init($request);
 
         $payload = $this->request->json()->all();
-        $isBatch = !$this->isAssociative($payload);
+        $this->isBatch = !$this->isAssociative($payload);
         $newModels = [];
-        if ($isBatch) {
+        if ($this->isBatch) {
             foreach ($payload as $pl)
                 $newModels[] = new $this->model($this->payload(true, null, $pl));
         } else {
             $newModels[] = new $this->model($this->payload(true));
         }
         
-        $responseModels = DB::transaction(function () use ($newModels, $isBatch) {
+        $responseModels = DB::transaction(function () use ($newModels) {
             $validationErrorCollection = [];
             $hasValidationErrors = false;
             $result = [];
             foreach ($newModels as $newModel) {
-                $this->willCreate($newModel);
                 if ($this->guardModels($this->getAuthUser()))
                     $this->onModelEvent('eloquent.creating: ' . get_class($newModel), [$newModel]);
                 $validationErrors = $this->performValidation($newModel);
@@ -226,7 +198,8 @@ trait CoreTrait
 
                 if ($hasValidationErrors)
                     continue;
-
+                
+                $this->will('Create', $newModel);
                 $newModel->save();
                 $this->disableListening();
                 $newModel->refresh();
@@ -236,7 +209,7 @@ trait CoreTrait
                     continue;
                 }
                 // reset query, in case we're batching
-                if ($isBatch)
+                if ($this->isBatch)
                     $this->query = $this->model->query();
                 $this->applySyncs($newModel, $this->getAuthUser());
                 $this->query->where($this->model->getKeyName(), $newModel->getKey());
@@ -244,7 +217,7 @@ trait CoreTrait
             }
 
             if ($hasValidationErrors) {
-                $validationErrors = $isBatch ? $validationErrorCollection : $validationErrorCollection[0];
+                $validationErrors = $this->isBatch ? $validationErrorCollection : $validationErrorCollection[0];
                 $this->errorResponse(
                     null,
                     Response::HTTP_BAD_REQUEST,
@@ -252,8 +225,6 @@ trait CoreTrait
             }
             return $result;
         });
-        $responseModels = $isBatch ? $responseModels : $responseModels[0];
-        $isBatch ? $this->didCreateMany(collect($responseModels)) : $this->didCreate($responseModels);
         return $this->successfulResponse($responseModels);
     }
 
@@ -267,18 +238,15 @@ trait CoreTrait
     {
         $this->init($request);
         $responseModels = [];
-        $isBatch = false;
-        DB::transaction(function () use ($resource, &$responseModels, &$isBatch) {
+        DB::transaction(function () use ($resource, &$responseModels) {
             $ids = $this->parseIds($resource);
-            $isBatch = sizeof($ids) > 1;
             foreach ($ids as $id) {
                 $modelToDelete = $this->findModel($id, true);
-                $this->willDelete($modelToDelete);
+                $this->will('Delete', $modelToDelete);
                 $modelToDelete->delete();
                 $responseModels[] = $modelToDelete;
             }
         });
-        $isBatch ? $this->didDeleteMany(collect($responseModels)) : $this->didDelete($responseModels[0]);
-        return $this->successfulResponse(null);
+        return $this->successfulResponse($responseModels);
     }
 }
