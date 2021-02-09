@@ -14,8 +14,17 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest] # , windows-latest, macOS-latest
         php-versions: [7.3, 7.4, 8.0]
+        laravel: [6.*, 7.*, 8.*]
+        dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - laravel: 6.*
+            testbench: 4.*
+          - laravel: 7.*
+            testbench: 5.*
+          - laravel: 8.*
+            testbench: 6.*
 
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }} Laravel v${{ matrix.laravel }} Testbench v${{ matrix.testbench }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
