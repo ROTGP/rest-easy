@@ -60,7 +60,7 @@ trait CoreTrait
                     'eloquent.retrieved: ' . get_class($this->model),
                     [$this->model]
                 );
-        
+
         return $this->successfulResponse($response);
     }
 
@@ -94,7 +94,7 @@ trait CoreTrait
         $payload = $this->request->json()->all();
         $this->isBatch = !$this->isAssociative($payload);
         $queriedModels = [];
-        
+
         foreach ($ids as $id) {
             if ($this->isBatch) {
                 $queriedModel = $this->findModel($id, true);
@@ -115,6 +115,7 @@ trait CoreTrait
             $hasValidationErrors = false;
             $result = [];
             foreach ($queriedModels as $queriedModel) {
+                // @TODO SO THE PROBLEM IS HERE
                 if ($this->guardModels($this->getAuthUser()))
                     $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
                 
@@ -130,7 +131,6 @@ trait CoreTrait
                     continue;
 
                 $this->will('Update', $queriedModel);
-
                 $queriedModel->save();
                 $this->disableListening();
                 $queriedModel->refresh();
@@ -157,7 +157,6 @@ trait CoreTrait
             }
             return $result;
         });
-        // dd($this->debugEvents);
         return $this->successfulResponse($responseModels);
     }
 

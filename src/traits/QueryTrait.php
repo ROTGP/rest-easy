@@ -23,9 +23,10 @@ trait QueryTrait
         $this->applySelects();
         $this->applyWiths();
         if ($id !== null) {
-            $model = $this->query->get();
-            $this->will('Get', $model);
-            return $model;
+            $collection = $this->query->get();
+            if (count($collection) === 1)
+                $this->will('Get', $collection->first());
+            return $collection;
         }
         $this->applyScopes();
         $this->applyGroupBy();

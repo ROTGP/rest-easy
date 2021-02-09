@@ -15,7 +15,6 @@ use App;
 
 trait PermissionTrait
 {      
-    protected $debugEvents = [];
     protected $eventNames = [
         'retrieved',
         'creating',
@@ -104,7 +103,7 @@ trait PermissionTrait
         return true;
     }
 
-    protected function onModelEvent($eventName, array $data) : void
+    protected function onModelEvent($eventName, array $data)
     { 
         if ($this->listening === false)
             return;
@@ -113,17 +112,16 @@ trait PermissionTrait
             return;
         $model = $data[0];
         $secondaryModel = $data[1] ?? null;
-        $this->debugEvents[] = [$event, $model];
 
-        foreach ($this->eventNames as $name)
-            $debugHookNames[] = $this->getHookName($name);
-        // dd($debugHookNames);
-
-        $hookName = $this->getHookName($event);
-        if (method_exists($model, $hookName))
-            $model->{$hookName}();
-        if (method_exists($this, $hookName))
-            $this->{$hookName}($model);
+        // @TODO AH FUCK
+        // $this->disableListening();
+        // $hookName = $this->getHookName($event);
+        // // dd($hookName);
+        // // if (method_exists($model, $hookName))
+        // //     $model->{$hookName}();
+        // if (method_exists($this, $hookName))
+        //     $this->{$hookName}($model);
+        // $this->enableListening();
         
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)
@@ -165,6 +163,8 @@ trait PermissionTrait
         );
         $this->logPermissionViolation($permissionException);
         $this->errorResponse($allowed, 403);
+
+        return false;
     }
 
     protected function buildPermissionException($errorCode, $model, $secondaryModel, $event) : array

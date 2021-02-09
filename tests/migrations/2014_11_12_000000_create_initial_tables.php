@@ -61,6 +61,7 @@ class CreateInitialTables extends Migration
             $table->string('biography', 500)->unique();
             $table->foreignId('record_label_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->string('fan_mail_address', 500)->nullable();
+            $table->string('history')->default('');
             $table->timestamps();
         });
 

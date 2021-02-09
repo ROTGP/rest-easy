@@ -22,32 +22,31 @@ class BatchTest extends IntegrationTestCase
             [
                 [
                     'id' => 5,
-                    'biography' => 'foo',
+                    'biography' => 'bio1',
                     'record_label_id' => 1
                 ],
                 [
                     'id' => 8,
-                    'biography' => 'bar',
+                    'biography' => 'bio2',
                     'record_label_id' => 1
                 ],
                 [
                     'id' => 10,
-                    'biography' => 'baz',
+                    'biography' => 'bio3',
                     'record_label_id' => 1
                 ]
             ]
         );
-        
         $response->assertStatus(200);
         $json = $this->decodeResponse($response);
-        
+
         $this->assertCount(3, $json);
         $this->assertEquals(5, $json[0]['id']);
         $this->assertEquals(8, $json[1]['id']);
         $this->assertEquals(10, $json[2]['id']);
-        $this->assertEquals('foo', $json[0]['biography']);
-        $this->assertEquals('bar', $json[1]['biography']);
-        $this->assertEquals('baz', $json[2]['biography']);
+        $this->assertEquals('bio1', $json[0]['biography']);
+        $this->assertEquals('bio2', $json[1]['biography']);
+        $this->assertEquals('bio3', $json[2]['biography']);
     }
 
     public function testBatchCreate()
@@ -56,17 +55,17 @@ class BatchTest extends IntegrationTestCase
         $response = $this->asUser(1)->json('POST', $query, [
             [
                 'name' => 'fooName1',
-                'biography' => 'foo',
+                'biography' => 'bio1',
                 'record_label_id' => 3
             ],
             [
                 'name' => 'fooName2',
-                'biography' => 'bar',
+                'biography' => 'bio2',
                 'record_label_id' => 2
             ],
             [
                 'name' => 'fooName3',
-                'biography' => 'baz',
+                'biography' => 'bio3',
                 'record_label_id' => 1
             ]
         ]);
@@ -76,9 +75,9 @@ class BatchTest extends IntegrationTestCase
         $this->assertEquals(12, $json[0]['id']);
         $this->assertEquals(13, $json[1]['id']);
         $this->assertEquals(14, $json[2]['id']);
-        $this->assertEquals('foo', $json[0]['biography']);
-        $this->assertEquals('bar', $json[1]['biography']);
-        $this->assertEquals('baz', $json[2]['biography']);
+        $this->assertEquals('bio1', $json[0]['biography']);
+        $this->assertEquals('bio2', $json[1]['biography']);
+        $this->assertEquals('bio3', $json[2]['biography']);
     }
 
     public function testBatchDelete()
@@ -88,7 +87,7 @@ class BatchTest extends IntegrationTestCase
         $query = 'artists/' . $ids;
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
-        // dd($json);
+        
         $this->assertEquals(
             explode(',', $ids),
             array_column($json, 'id')
@@ -98,6 +97,8 @@ class BatchTest extends IntegrationTestCase
         $idsToDeleteArr = array_map('intval', explode(',', $idsToDelete));
         $response = $this->json('DELETE', 'artists/' . $idsToDelete)
            ->assertStatus(204);
+        $json = $this->decodeResponse($response);
+        $this->assertNull($json);
 
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
@@ -130,7 +131,7 @@ class BatchTest extends IntegrationTestCase
         for ($i = 0; $i < 100; $i++) {
             $payload[] = [
                 'name' => 'fooName' . $i,
-                'biography' => base64_encode(random_bytes(32)),
+                'biography' => 'bio' . $i,
                 'record_label_id' => 1
             ];
         }
@@ -144,6 +145,7 @@ class BatchTest extends IntegrationTestCase
         $json = $this->decodeResponse($response);
         $this->assertCount(100, $json);
         $this->assertEquals(111, $json[99]['id']);
+        $this->assertEquals('bio99', $json[99]['biography']);
         $this->assertEquals('island_def_jam', $json[99]['record_label']['name']);
     }
 
@@ -153,23 +155,23 @@ class BatchTest extends IntegrationTestCase
         $response = $this->asUser(1)->json('POST', $query, [
             [
                 'name' => 'fooName1',
-                'biography' => 'foo',
+                'biography' => 'bio1',
                 'record_label_id' => 3
             ],
             [
                 'name' => 'fooName2',
-                'biography' => 'bar',
+                'biography' => 'bio2',
                 'record_label_id' => 200 // trigger validation error with bad id
             ],
             [
                 'name' => 'fooName3',
-                'biography' => 'baz',
+                'biography' => 'bio3',
                 'record_label_id' => 1
             ]
         ]);
         $response->assertStatus(400);
         $json = $this->decodeResponse($response);
-        
+
         $id = 12;
         $query = 'artists/' . $id;
         $response = $this->get($query)
@@ -189,23 +191,23 @@ class BatchTest extends IntegrationTestCase
         $response = $this->asUser(1)->json('POST', $query, [
             [
                 'name' => 'fooName1',
-                'biography' => base64_encode(random_bytes(32)),
+                'biography' => 'bio1',
                 'record_label_id' => 3
             ]]);
         $json = $this->decodeResponse($response);
 
         $this->assertCount(1, $json);
         $this->assertEquals(12, $json[0]['id']);
-        $this->assertEquals(3, $json[0]['record_label_id']);
+        $this->assertEquals('bio1', $json[0]['biography']);
 
         $response = $this->asUser(1)->json('POST', $query, [
             'name' => 'fooName2',
-            'biography' => base64_encode(random_bytes(32)),
+            'biography' => 'bio2',
             'record_label_id' => 3
         ]);
         $json = $this->decodeResponse($response);
 
         $this->assertEquals(13, $json['id']);
-        $this->assertEquals(3, $json['record_label_id']);
+        $this->assertEquals('bio2', $json['biography']);
     }
 }

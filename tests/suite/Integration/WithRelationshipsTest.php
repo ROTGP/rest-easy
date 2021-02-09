@@ -61,7 +61,7 @@ class WithRelationshipsTest extends IntegrationTestCase
         $query = 'artists/5?with=record_label,users,albums,foo';
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
-        $response->assertJsonCount(7);
+        $response->assertJsonCount(8);
         $response->assertStatus(200);
         $this->assertArrayNotHasKey('record_label', $json);
         $this->assertArrayNotHasKey('users', $json);

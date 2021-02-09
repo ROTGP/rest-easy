@@ -19,7 +19,7 @@ class Artist extends Model
      * @var array
      */
     protected $casts = [
-        'record_label_id' => 'int',
+        'record_label_id' => 'int'
     ];
 
     protected function validationRules($authUser)

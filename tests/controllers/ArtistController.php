@@ -2,51 +2,53 @@
 
 namespace ROTGP\RestEasy\Test\Controllers;
 
+use Illuminate\Support\Collection;
+
 class ArtistController extends BaseController
 {
     public function willGet($model)
     {
-        event('hook.artist.will', 'willGetHook');
+        $this->updateHistory($model, 'willGet');
     }
 
     public function willList($query)
     {
-        event('hook.artist.will', 'willListHook');
+        event('resteasy.artist.list', ['willList', $query->toSql()]);
     }
 
     public function willUpdate($model)
     {
-        event('hook.artist.will', 'willUpdateHook');
+        $this->updateHistory($model, 'willUpdate');
     }
 
     public function willCreate($model)
     {
-        event('hook.artist.will', 'willCreateHook');
+        $this->updateHistory($model, 'willCreate');
     }
 
     public function willDelete($model)
     {
-        event('hook.artist.will', 'willDeleteHook');
+        event('resteasy.artist.delete', ['willDelete', $model]);
     }
 
     public function didGet($model)
     {
-        event('hook.artist.did', ['didGetHook', $model]);
+        $this->updateHistory($model, 'didGet');
     }
 
     public function didUpdate($model)
     {
-        event('hook.artist.did', ['didUpdateHook', $model]);
+        $this->updateHistory($model, 'didUpdate');
     }
 
     public function didCreate($model)
     {
-        event('hook.artist.did', ['didCreateHook', $model]);
+        $this->updateHistory($model, 'didCreate');
     }
 
     public function didDelete($model)
     {
-        event('hook.artist.did', ['didDeleteHook', $model]);
+        event('resteasy.artist.delete', ['didDelete', $model]);
     }
 
     public function useAfterHooks()
@@ -56,35 +58,30 @@ class ArtistController extends BaseController
 
     public function didGetAfter($model)
     {
-        $this->incrementBiography($model);
+        $this->updateHistory($model, 'didGetAfter');
     }
 
     public function didUpdateAfter($model)
     {
-        $this->incrementBiography($model);
+        $this->updateHistory($model, 'didUpdateAfter');
     }
 
     public function didCreateAfter($model)
     {
-        $this->incrementBiography($model);
+        $this->updateHistory($model, 'didCreateAfter');
     }
 
     public function didDeleteAfter($model)
     {
-        // $this->incrementBiography($model);
+        event('resteasy.artist.delete', ['didDeleteAfter', $model]);
     }
 
-    public function incrementBiography($model)
+    public function updateHistory($model, $value)
     {
-        $biography = $model->biography;
-        $idx = 0;
-        if (preg_match('#(\d+)$#', $biography, $matches)) {
-            $biography = str_replace($matches[1], '' , $biography);
-            $idx = intval($matches[1]);
-        }
-        $idx++;
-        $model->biography = $biography . $idx;
+        $history = $model->history;
+        $pieces = array_filter(explode('.', $history));
+        $pieces[] = $value;
+        $model->history = implode('.', $pieces);
         $model->save();
-        // echo ' IDX => ' . $idx . "\n";
     }
 }

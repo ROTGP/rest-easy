@@ -19,13 +19,14 @@ trait ResponseTrait
         /**
          * Now that we have our response and all user-initiated
          * requests have been resolved, it's safe to disable 
-         * model event listening, so that models can be queried
+         * model event listening, so that models may be queried
          * in did/after hooks.
          */
         $this->disableListening();
 
         $actionMethod = Route::getCurrentRoute()->getActionMethod();
         $method = Str::studly($this->method);
+        
         if ($method === 'Index') {
             $method = 'Get';
         } else if ($method === 'Post') {
