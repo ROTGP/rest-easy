@@ -113,10 +113,8 @@ trait PermissionTrait
         $model = $data[0];
         $secondaryModel = $data[1] ?? null;
 
-        // @TODO AH FUCK
         // $this->disableListening();
         // $hookName = $this->getHookName($event);
-        // // dd($hookName);
         // // if (method_exists($model, $hookName))
         // //     $model->{$hookName}();
         // if (method_exists($this, $hookName))
