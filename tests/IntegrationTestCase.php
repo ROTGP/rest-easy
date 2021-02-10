@@ -22,7 +22,7 @@ class IntegrationTestCase extends TestCase
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
         // echo "\n\n" . $this->getName() . "======> \n";
 
-        echo "\n\n" . app()->version() . "======> \n";
+        echo "\n\nv" . app()->version() . "\n";
 
     }
 

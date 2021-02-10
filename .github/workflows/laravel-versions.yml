@@ -15,11 +15,10 @@ jobs:
         strategy:
           matrix:
             php: [8.0, 7.4, 7.3]
-            dependency-version: [prefer-lowest] # , prefer-stable
             testbench: [6.0.0, 5.0.0]
             os: [ubuntu-latest]
 
-        name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+        name: PHP${{ matrix.php }} - Testbench ${{ matrix.testbench }}
 
         steps:
             - name: Checkout code
@@ -31,6 +30,12 @@ jobs:
                 php-version: ${{ matrix.php }}
                 extensions: intl, fileinfo, pdo_sqlite
                 ini-values: "post_max_size=256M"
+           
+            - name: Cache composer dependencies
+              uses: actions/cache@v1
+              with:
+                path: vendor
+                key: composer-${{ hashFiles('composer.lock') }}
 
             - name: Install dependencies
               run: |
