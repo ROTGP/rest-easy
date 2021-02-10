@@ -1,9 +1,12 @@
+# https://freek.dev/1546-using-github-actions-to-run-the-tests-of-laravel-projects-and-packages
+# https://github.com/facade/ignition/blob/412a979c2346a833b9ed0598e82214006dba3899/.github/workflows/run-tests.yml
+
 name: Run tests
 
 on:
   push:
-  schedule:
-      - cron: '0 0 * * *'
+    branches:
+      - master
 
 jobs:
     php-tests:
@@ -46,4 +49,7 @@ jobs:
                   composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
             - name: Execute tests
-              run: vendor/bin/phpunit
+              run: ./vendor/bin/phpunit
+              env:
+                  APP_ENV: testing
+        
