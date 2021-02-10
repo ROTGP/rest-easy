@@ -15,14 +15,11 @@ jobs:
         strategy:
           matrix:
             php: [8.0]
-            laravel: [8.*]
             dependency-version: [prefer-lowest] # , prefer-stable
+            testbench: [6.0.0]
             os: [ubuntu-latest]
-            include:
-              - laravel: 8.*
-                testbench: 6.*
 
-        name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+        name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
         steps:
             - name: Checkout code
@@ -37,7 +34,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+                  composer require "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
                   composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
             - name: Execute tests
