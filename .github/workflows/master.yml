@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest] #, windows-latest, macOS-latest
         php: [8.0, 7.4, 7.3]
-        testbench: [6.0, 5.0, 4.0]
+        testbench: [6.0, 5.0]
 
     name: PHP v${{ matrix.php }} - Testbench v${{ matrix.testbench }} on ${{ matrix.os }}
     steps:
