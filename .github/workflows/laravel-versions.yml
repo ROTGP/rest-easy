@@ -9,41 +9,41 @@ on:
       - master # laravel-versions
 
 jobs:
-    php-tests:
-        runs-on: ${{ matrix.os }}
+  php-tests:
+    runs-on: ${{ matrix.os }}
 
-        strategy:
-          matrix:
-            php: [8.0, 7.4, 7.3]
-            testbench: [6.0.0, 5.0.0]
-            os: [ubuntu-latest]
+    strategy:
+      matrix:
+        php: [8.0, 7.4, 7.3]
+        testbench: [6.0.0, 5.0.0]
+        os: [ubuntu-latest]
 
-        name: PHP${{ matrix.php }} - Testbench ${{ matrix.testbench }}
+    name: PHP v${{ matrix.php }} - Testbench v${{ matrix.testbench }}
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                php-version: ${{ matrix.php }}
-                extensions: intl, fileinfo, pdo_sqlite
-                ini-values: "post_max_size=256M"
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, fileinfo, pdo_sqlite
+          ini-values: "post_max_size=256M"
            
-            - name: Cache composer dependencies
-              uses: actions/cache@v1
-              with:
-                path: vendor
-                key: composer-${{ hashFiles('composer.lock') }}
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
 
-            - name: Install dependencies
-              run: |
-                  composer install -n --prefer-dist
-                  composer require "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --with-all-dependencies
+      - name: Install dependencies
+        run: |
+             composer install -n --prefer-dist
+             composer require "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --with-all-dependencies
 
-            - name: Execute tests
-              run: ./vendor/bin/phpunit
-              env:
-                  APP_ENV: testing
+      - name: Execute tests
+        run: ./vendor/bin/phpunit
+        env:
+          APP_ENV: testing
         
