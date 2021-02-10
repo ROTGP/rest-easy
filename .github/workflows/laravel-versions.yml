@@ -35,9 +35,9 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: ${{ matrix.php }}
-                  extension-csv: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-                  coverage: none
+                php-version: ${{ matrix.php }}
+                extensions: intl, fileinfo, pdo_sqlite
+                ini-values: "post_max_size=256M"
 
             - name: Install dependencies
               run: |
