@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Faker\Factory as Faker;
 
@@ -31,31 +30,31 @@ class CreateInitialTables extends Migration
      */
     public function up()
     {
-        Schema::create('genres', function (Blueprint $table) {
+        Schema::create('genres', function ($table) {
             $table->id();
             $table->string('name')->unique();
         });
         $this->createConstant(Genre::class);
 
-        Schema::create('record_labels', function (Blueprint $table) {
+        Schema::create('record_labels', function ($table) {
             $table->id();
             $table->string('name')->unique();
         });
         $this->createConstant(RecordLabel::class);
 
-        Schema::create('streaming_services', function (Blueprint $table) {
+        Schema::create('streaming_services', function ($table) {
             $table->id();
             $table->string('name')->unique();
         });
         $this->createConstant(StreamingService::class);
 
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('roles', function ($table) {
             $table->id();
             $table->string('name')->unique();
         });
         $this->createConstant(Role::class);
 
-        Schema::create('artists', function (Blueprint $table) {
+        Schema::create('artists', function ($table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('biography', 500)->unique();
@@ -65,7 +64,7 @@ class CreateInitialTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create('albums', function (Blueprint $table) {
+        Schema::create('albums', function ($table) {
             $table->id();
             $table->string('name')->unique();
             $table->foreignId('artist_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
@@ -76,7 +75,7 @@ class CreateInitialTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create('songs', function (Blueprint $table) {
+        Schema::create('songs', function ($table) {
             $table->id();
             $table->string('name')->unique();
             $table->foreignId('album_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
@@ -84,32 +83,32 @@ class CreateInitialTables extends Migration
             $table->timestamps();
         });
 
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', function ($table) {
             $table->foreignId('role_id')->default(Role::FAN)->constrained()->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::create('artist_user', function (Blueprint $table) {
+        Schema::create('artist_user', function ($table) {
             $table->id();
             $table->foreignId('artist_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->nullableTimestamps();
         });
 
-        Schema::create('album_user', function (Blueprint $table) {
+        Schema::create('album_user', function ($table) {
             $table->id();
             $table->foreignId('album_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->nullableTimestamps();
         });
 
-        Schema::create('song_user', function (Blueprint $table) {
+        Schema::create('song_user', function ($table) {
             $table->id();
             $table->foreignId('song_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->nullableTimestamps();
         });
 
-        Schema::create('plays', function (Blueprint $table) {
+        Schema::create('plays', function ($table) {
             $table->id();
             $table->foreignId('song_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
