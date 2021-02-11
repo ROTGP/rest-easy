@@ -16,7 +16,7 @@ jobs:
         php: [8.0, 7.4, 7.3]
         testbench: [6.0, 5.0]
 
-    name: PHP v${{ matrix.php }} - Testbench v${{ matrix.testbench }} on ${{ matrix.os }}
+    name: PHP v${{ matrix.php }} - Laravel v${{ matrix.testbench + 2 }} (Testbench v${{ matrix.testbench }}) on ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
