@@ -68,6 +68,15 @@ trait ResponseTrait
         throw new Exception('Unsupported request method');
     }
 
+    protected function validationErrorResponse($validationErrors) : void
+    {
+        $validationErrors = $this->isBatch ? $validationErrors : $validationErrors[0];
+        $this->errorResponse(
+            null,
+            Response::HTTP_BAD_REQUEST,
+            ['validation_errors' => $validationErrors]);
+    }
+
     protected function errorResponse($errorCode = null, int $httpStatusCode = 500, $extras = []) : void
     {
         if (!is_int($httpStatusCode))

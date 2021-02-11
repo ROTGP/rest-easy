@@ -43,6 +43,7 @@ trait RequestTrait
     {
         if ($payload === null)
             $payload = $this->request->json()->all();
+
         // when updating a model, fill payload with any fields that
         // aren't provided, thus allowing for PATCH funcionality with
         // PUT requests

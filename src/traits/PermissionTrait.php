@@ -113,12 +113,12 @@ trait PermissionTrait
         $model = $data[0];
         $secondaryModel = $data[1] ?? null;
 
+        // @TODO
         // $this->disableListening();
         // $hookName = $this->getHookName($event);
-        // // if (method_exists($model, $hookName))
-        // //     $model->{$hookName}();
-        // if (method_exists($this, $hookName))
-        //     $this->{$hookName}($model);
+        // echo $hookName . "\n";
+        // if (method_exists($model, $hookName))
+        //     $model->{$hookName}();
         // $this->enableListening();
         
         $permissionMethodName = $this->getPermissionName($event);
@@ -175,7 +175,7 @@ trait PermissionTrait
         $data['error_code'] = is_int($errorCode) ? $errorCode : null;
         $errorKey = $this->findErrorKey($errorCode);
         $data['error_message'] = $errorKey ===  null ? null : ucfirst(strtolower(str_replace('_', ' ', $errorKey)));
-        $data['auth_user_id'] = $authUser->id;        
+        $data['auth_user_key'] = $authUser->getKey();
         $data['model'] = get_class($model);
         $data['model_key'] = optional($model)->getKey();
         if ($secondaryModel !== null) {
@@ -183,17 +183,17 @@ trait PermissionTrait
             $data['secondary_model_key'] = optional($secondaryModel)->getKey();
         }
         $verb = $this->eventActions[$event];
-        $message = $authUser->id === null ? 'Unauthenticated user' : 'Authenticated user with id ' . $authUser->id;
+        $message = $authUser->getKey() === null ? 'Unauthenticated user' : 'Authenticated user with key ' . $authUser->getKey();
         $message .= ' was denied permission to ' . $verb;
         if ($secondaryModel !== null) {
             $message .= ' model ' . (new ReflectionClass($secondaryModel))->getShortName();
-            $message .= ' with id ' . $secondaryModel->id . ' ';
+            $message .= ' with key ' . $secondaryModel->getKey() . ' ';
             $syncVerb = $verb === 'attach' ? 'to' : 'from';
             $message .=  $syncVerb . ' model ' . (new ReflectionClass($model))->getShortName();
-            $message .= ' with id ' . $model->id;
+            $message .= ' with key ' . $model->getKey();
         } else {
             $message .= ' model ' . (new ReflectionClass($model))->getShortName();
-            if ($model->id !== null) $message .= ' with id ' . $model->id;
+            if ($model->getKey() !== null) $message .= ' with key ' . $model->getKey();
         }
 
         $data['message'] = $message;

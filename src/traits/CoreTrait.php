@@ -73,10 +73,10 @@ trait CoreTrait
     public function _show(Request $request, $resource)
     {
         $this->init($request);
-        $ids = $this->parseIds($resource);
+        $keys = $this->parseKeys($resource);
         $responseModels = [];
-        foreach ($ids as $id)
-            $responseModels[] = $this->getModel($id);
+        foreach ($keys as $key)
+            $responseModels[] = $this->getModel($key);
         return $this->successfulResponse($responseModels);
     }
 
@@ -90,23 +90,23 @@ trait CoreTrait
     public function _update(Request $request, $resource)
     {
         $this->init($request);
-        $ids = $this->parseIds($resource);
+        $keys = $this->parseKeys($resource);
         $payload = $this->request->json()->all();
         $this->isBatch = !$this->isAssociative($payload);
         $queriedModels = [];
 
-        foreach ($ids as $id) {
+        foreach ($keys as $key) {
             if ($this->isBatch) {
-                $queriedModel = $this->findModel($id, true);
-                $pl = $this->findBatchPayload($id, $payload);
+                $queriedModel = $this->findModel($key, true);
+                $pl = $this->findBatchPayload($key, $payload);
                 if ($pl == null)
                     continue;
                 $queriedModel->fill($this->payload(true, null, $pl));
                 $queriedModels[] = $queriedModel;
             } else {
-                $queriedModel = $this->findModel($id, true);
+                $queriedModel = $this->findModel($key, true);
                 $queriedModel->fill($this->payload(true));
-                $queriedModels[] = $queriedModel;            
+                $queriedModels[] = $queriedModel;
             }
         }
         
@@ -115,7 +115,6 @@ trait CoreTrait
             $hasValidationErrors = false;
             $result = [];
             foreach ($queriedModels as $queriedModel) {
-                // @TODO SO THE PROBLEM IS HERE
                 if ($this->guardModels($this->getAuthUser()))
                     $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
                 
@@ -148,13 +147,8 @@ trait CoreTrait
                 $result[] = $this->applyQueryFilters($queriedModel->getKey())->first();
             }
 
-            if ($hasValidationErrors) {
-                $validationErrors = $this->isBatch ? $validationErrorCollection : $validationErrorCollection[0];
-                $this->errorResponse(
-                    null,
-                    Response::HTTP_BAD_REQUEST,
-                    ['validation_errors' => $validationErrors]);
-            }
+            if ($hasValidationErrors)
+                $this->validationErrorResponse($validationErrorCollection);
             return $result;
         });
         return $this->successfulResponse($responseModels);
@@ -212,16 +206,11 @@ trait CoreTrait
                     $this->query = $this->model->query();
                 $this->applySyncs($newModel, $this->getAuthUser());
                 $this->query->where($this->model->getKeyName(), $newModel->getKey());
-                $result[] = $this->applyQueryFilters($newModel->id)->first();
+                $result[] = $this->applyQueryFilters($newModel->getKey())->first();
             }
 
-            if ($hasValidationErrors) {
-                $validationErrors = $this->isBatch ? $validationErrorCollection : $validationErrorCollection[0];
-                $this->errorResponse(
-                    null,
-                    Response::HTTP_BAD_REQUEST,
-                    ['validation_errors' => $validationErrors]);
-            }
+            if ($hasValidationErrors)
+                $this->validationErrorResponse($validationErrorCollection);
             return $result;
         });
         return $this->successfulResponse($responseModels);
@@ -238,9 +227,9 @@ trait CoreTrait
         $this->init($request);
         $responseModels = [];
         DB::transaction(function () use ($resource, &$responseModels) {
-            $ids = $this->parseIds($resource);
-            foreach ($ids as $id) {
-                $modelToDelete = $this->findModel($id, true);
+            $keys = $this->parseKeys($resource);
+            foreach ($keys as $key) {
+                $modelToDelete = $this->findModel($key, true);
                 $this->will('Delete', $modelToDelete);
                 $modelToDelete->delete();
                 $responseModels[] = $modelToDelete;

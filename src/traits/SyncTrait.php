@@ -46,7 +46,7 @@ trait SyncTrait
                 $belongsToMany = $queriedModel->{$relationship}();
                 $relatedPivotKey = $belongsToMany->getRelatedPivotKeyName();
                 $sql = $belongsToMany->getQuery()->select($relatedPivotKey)->toSql();
-                $sql = str_replace('?', $queriedModel->id, $sql);
+                $sql = str_replace('?', $queriedModel->getKey(), $sql);
 
                 $existingIds = collect(DB::select(DB::raw($sql)))->pluck($relatedPivotKey)->unique();
                 $toSync = collect($ids)->unique();

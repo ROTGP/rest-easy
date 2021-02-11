@@ -215,23 +215,23 @@ trait MetaTrait
         return $model;
     }
 
-    public function findBatchPayload($id, $payload)
+    public function findBatchPayload($key, $payload)
     {
         $keyName = $this->model->getKeyName();
         foreach ($payload as $pl)
-            if (array_key_exists($keyName, $pl) && $pl[$keyName] == $id)
+            if (array_key_exists($keyName, $pl) && $pl[$keyName] == $key)
                 return $pl;
     }
 
-    protected function parseIds($resource)
+    protected function parseKeys($resource)
     {
-        $ids = explode(',', $resource);
-        for ($i = 0; $i < count($ids); $i++) {
-            $id = preg_replace("/[^A-Za-z0-9]/", '', $ids[$i]);
-            if (is_numeric($id))
-                $id = (int) $id;
-            $ids[$i] = $id;
+        $keys = explode(',', $resource);
+        for ($i = 0; $i < count($keys); $i++) {
+            $key = preg_replace("/[^A-Za-z0-9]/", '', $keys[$i]);
+            if (is_numeric($key))
+                $key = (int) $key;
+            $keys[$i] = $key;
         }
-        return $ids;
+        return $keys;
     }
 }
