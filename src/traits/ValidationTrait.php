@@ -119,11 +119,16 @@ trait ValidationTrait
         });
 
         if ($validator->fails())
-            return $this->translateValidationMessages($validator);
+            return json_decode(json_encode($this->translateValidationMessages($validator)), true);
     }
 
     protected function translateValidationMessages($validator)
     {
         return $validator->messages()->messages();
+    }
+
+    protected function useBatchKeys() : bool
+    {
+        return true;
     }
 }

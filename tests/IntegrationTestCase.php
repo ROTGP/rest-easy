@@ -62,4 +62,20 @@ class IntegrationTestCase extends TestCase
         $this->assertArrayHasKey('http_status_message', $json);
         $this->assertEquals('Forbidden', $json['http_status_message']);
     }
+
+    protected function assertAssociativeArray($value)
+    {
+        $this->assertTrue($this->isAssociative($value));
+    }
+
+    protected function assertIndexedArray($value)
+    {
+        $this->assertFalse($this->isAssociative($value));
+    }
+
+    protected function isAssociative(array $value)
+    {
+        if (array() === $value) return false;
+        return array_keys($value) !== range(0, count($value) - 1);
+    }
 }

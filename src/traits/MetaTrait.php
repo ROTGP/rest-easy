@@ -17,6 +17,19 @@ trait MetaTrait
     protected $modelMethods;
     protected $columns;
     protected $queriedModel;
+    protected $batchPayloadKeys = [];
+
+    protected function updateBatchPayloadKey($updating, $model, $payload)
+    {
+        $key = null;
+        // if we're updating, the native key (id) will always be in the payload
+        if ($updating) {
+            $key = strval($payload[$model->getKeyName()]);
+        } else {
+            $key = $payload['tmp_key'] ?? null;
+        }
+        $this->batchPayloadKeys[spl_object_hash($model)] = $key;
+    }
 
     protected function authUser()
     {

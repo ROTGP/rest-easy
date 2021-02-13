@@ -14,8 +14,15 @@ use Str;
 
 trait ResponseTrait
 {      
+    protected function cleanUp()
+    {
+        $this->disableListening();
+        event('eloquent.cleanUp', null);
+    }
+
     protected function successfulResponse($response) : Response
     {
+        $this->cleanUp();
         /**
          * Now that we have our response and all user-initiated
          * requests have been resolved, it's safe to disable 
@@ -68,17 +75,38 @@ trait ResponseTrait
         throw new Exception('Unsupported request method');
     }
 
-    protected function validationErrorResponse($validationErrors) : void
+    protected function validationErrorResponse($models, $validationErrors) : void
     {
-        $validationErrors = $this->isBatch ? $validationErrors : $validationErrors[0];
+        $result = [];
+        if ($this->isBatch) {
+            if ($this->useBatchKeys()) {
+                $keys = [];
+                for ($i = 0; $i < count($models); $i++) {
+                    $key = $this->batchPayloadKeys[spl_object_hash($models[$i])];
+                    if ($key !== null) $keys[] = $key;
+                }
+                if (count($keys) === 0 || count($keys) !== count($validationErrors)) {
+                    $result = $validationErrors;
+                } else {
+                    for ($i = 0; $i < count($keys); $i++)
+                        $result[strval($keys[$i])] = $validationErrors[$i];
+                }
+            } else {
+                $result = $validationErrors;
+            }
+        } else {
+            $result = $validationErrors[0];
+        }
         $this->errorResponse(
             null,
             Response::HTTP_BAD_REQUEST,
-            ['validation_errors' => $validationErrors]);
+            ['validation_errors' => $result]);
     }
 
     protected function errorResponse($errorCode = null, int $httpStatusCode = 500, $extras = []) : void
     {
+        $this->cleanUp();
+        
         if (!is_int($httpStatusCode))
             throw new Exception('HTTP status code is required');
 

@@ -84,4 +84,9 @@ class ArtistController extends BaseController
         $model->history = implode('.', $pieces);
         $model->save();
     }
+
+    protected function useBatchKeys() : bool
+    {
+        return $this->getAuthUser()->id !== 2;
+    }
 }

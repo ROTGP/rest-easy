@@ -104,7 +104,10 @@ trait PermissionTrait
     }
 
     protected function onModelEvent($eventName, array $data)
-    { 
+    {
+        if ($eventName === 'eloquent.cleanUp') {
+            return false;
+        }
         if ($this->listening === false)
             return;
         $event = trim(strstr(strstr($eventName, '.'), ':', true), '.:');

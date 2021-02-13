@@ -102,6 +102,7 @@ trait CoreTrait
                 if ($pl == null)
                     continue;
                 $queriedModel->fill($this->payload(true, null, $pl));
+                $this->updateBatchPayloadKey(true, $queriedModel, $pl);
                 $queriedModels[] = $queriedModel;
             } else {
                 $queriedModel = $this->findModel($key, true);
@@ -148,7 +149,7 @@ trait CoreTrait
             }
 
             if ($hasValidationErrors)
-                $this->validationErrorResponse($validationErrorCollection);
+                $this->validationErrorResponse($queriedModels, $validationErrorCollection);
             return $result;
         });
         return $this->successfulResponse($responseModels);
@@ -168,8 +169,11 @@ trait CoreTrait
         $this->isBatch = !$this->isAssociative($payload);
         $newModels = [];
         if ($this->isBatch) {
-            foreach ($payload as $pl)
-                $newModels[] = new $this->model($this->payload(true, null, $pl));
+            foreach ($payload as $pl) {
+                $newModel = new $this->model($this->payload(true, null, $pl));
+                $this->updateBatchPayloadKey(false, $newModel, $pl);
+                $newModels[] = $newModel;
+            }
         } else {
             $newModels[] = new $this->model($this->payload(true));
         }
@@ -210,7 +214,7 @@ trait CoreTrait
             }
 
             if ($hasValidationErrors)
-                $this->validationErrorResponse($validationErrorCollection);
+                $this->validationErrorResponse($newModels, $validationErrorCollection);
             return $result;
         });
         return $this->successfulResponse($responseModels);

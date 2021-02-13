@@ -108,7 +108,8 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    public function canRead($authUser) {
+    public function canRead($authUser)
+    {
         return true;
     }
 
