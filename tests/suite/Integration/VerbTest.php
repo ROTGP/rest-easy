@@ -3,30 +3,6 @@ use ROTGP\RestEasy\Test\IntegrationTestCase;
 
 class VerbTest extends IntegrationTestCase
 {
-    public function testCanDeleteWhenHasPermissionToDeleteButNotPermissionToRead()
-    {
-        // user 3 has permission to delete, but not to read
-        $id = 5;
-        $query = 'artists/' . $id;
-
-        $response = $this->asUser(3)->get('artists/' . $id);
-        $this->assertForbidden($response);
-
-        $response = $this->asUser(3)->json('DELETE', $query)
-            ->assertStatus(204);
-            
-        $this->get('artists/' . $id)
-            ->assertJsonStructure([
-                'http_status_code',
-                'http_status_message'
-            ])
-            ->assertJsonFragment([
-                'http_status_code' => 404,
-                'http_status_message' => 'Not Found'
-            ])
-            ->assertStatus(404);
-    }
-
     public function testBasicGet()
     {
         $id = 5;

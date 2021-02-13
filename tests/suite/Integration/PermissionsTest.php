@@ -208,4 +208,48 @@ class PermissionsTest extends IntegrationTestCase
         $json = $this->decodeResponse($response);
         $this->assertCount(0, $json);
     }
+
+    public function testCanDeleteWhenHasPermissionToDeleteButNotPermissionToRead()
+    {
+        // user 3 has permission to delete, but not to read
+        $id = 5;
+        $query = 'artists/' . $id;
+
+        $response = $this->asUser(3)->get('artists/' . $id);
+        $this->assertForbidden($response);
+
+        $response = $this->asUser(3)->json('DELETE', $query)
+            ->assertStatus(204);
+            
+        $this->get('artists/' . $id)
+            ->assertJsonStructure([
+                'http_status_code',
+                'http_status_message'
+            ])
+            ->assertJsonFragment([
+                'http_status_code' => 404,
+                'http_status_message' => 'Not Found'
+            ])
+            ->assertStatus(404);
+    }
+
+    public function testCanCreateWhenHasPermissionToCreateButNotPermissionToRead()
+    {
+        // user 3 has permission to create, but not to read
+        $query = 'artists';
+        $response = $this->asUser(3)->json('POST', $query, [
+            'name' => 'fooName',
+            'biography' => 'barBiography',
+            'record_label_id' => 3,
+            ])->assertStatus(201);
+
+        $json = $this->decodeResponse($response);
+        $id = $json['id'];
+
+        $response = $this->asUser(3)->get('artists/' . $id);
+        $this->assertForbidden($response);
+
+        $this->asUser(2)->get('artists/' . $id)
+            ->assertStatus(200);
+    }
 }

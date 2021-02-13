@@ -20,7 +20,6 @@ class IntegrationTestCase extends TestCase
     {
         parent::setUp();
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        // echo "\n\n" . $this->getName() . "======> \n";
     }
 
     /**

@@ -46,21 +46,20 @@ trait PermissionTrait
     /**
      * In certain circumstances, we need to perform database
      * queries (such as finding a model which is to be deleted)
-     * which trigger permission requests. In the example, a 
-     * 'canRead' request will be performed before the 'canDelete',
-     * and there may be some situations wheere the rules are
-     * conflictive. So, when we interact with the database 
-     * directly (via eloquent), we temporarily set this variable
-     * to false, which tells onModelEvent to ignore the event. 
+     * which trigger permission requests. So, when we interact 
+     * with the database directly (via eloquent), we 
+     * temporarily set $listening to false, which tells 
+     * onModelEvent to ignore the event. 
      *
      * @var boolean
      */ 
-    protected $listening = true;
+    protected $listening = false;
 
     protected function startEloquentGuard() : void
     {
         if ($this->guardModels($this->getAuthUser()) !== true)
             return;
+        $this->enableListening();
         Event::listen('eloquent.*', Closure::fromCallable([$this, 'onModelEvent']));
     }
 
