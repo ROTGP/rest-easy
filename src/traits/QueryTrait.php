@@ -36,11 +36,6 @@ trait QueryTrait
         return $this->applyPagination($this->query);
     }
 
-    protected function getTransformations() : array
-    {
-        return $this->accessProtectedProperty('transformations');
-    }
-
     protected function getSafeScopes() : array
     {
         $safeScopes = $this->callProtectedMethod(

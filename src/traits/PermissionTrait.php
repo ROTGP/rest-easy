@@ -43,6 +43,8 @@ trait PermissionTrait
         'detaching' => 'detach'
     ];
 
+    protected $listenerAdded = false;
+
     /**
      * In certain circumstances, we need to perform database
      * queries (such as finding a model which is to be deleted)
@@ -57,10 +59,15 @@ trait PermissionTrait
 
     protected function startEloquentGuard() : void
     {
-        if ($this->guardModels($this->getAuthUser()) !== true)
+        if ($this->guardModels($this->getAuthUser()) !== true) {
+            $this->disableListening();
             return;
+        }
         $this->enableListening();
-        Event::listen('eloquent.*', Closure::fromCallable([$this, 'onModelEvent']));
+        if (!$this->listenerAdded) {
+            Event::listen('eloquent.*', Closure::fromCallable([$this, 'onModelEvent']));
+            $this->listenerAdded = true;
+        }
     }
 
     protected function enableListening()
@@ -104,9 +111,6 @@ trait PermissionTrait
 
     protected function onModelEvent($eventName, array $data)
     {
-        if ($eventName === 'eloquent.cleanUp') {
-            return false;
-        }
         if ($this->listening === false)
             return;
         $event = trim(strstr(strstr($eventName, '.'), ':', true), '.:');

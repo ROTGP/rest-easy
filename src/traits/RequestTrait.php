@@ -11,29 +11,6 @@ use Str;
 
 trait RequestTrait
 {   
-    protected function transform(array $payload) : array
-    {
-        $transformations = $this->getTransformations();
-        $modelMethods = $this->getModelMethods();
-        foreach ($payload as $field => $value) {
-            foreach ($transformations as $transformationField => $transformationRules) {
-                if ($field !== $transformationField) continue;
-                $transformRules = explode('|', $transformationRules);
-                foreach ($transformRules as $transformRule) {
-                    $ruleName = 'transform' . Str::studly($transformRule);
-                    if (!in_array($ruleName, $modelMethods))
-                        continue;
-                    $payload[$field] = $this->callProtectedMethod(
-                        $this->queriedModel(),
-                        $ruleName,
-                        $payload[$field]
-                    );
-                }
-            }
-        }
-        return $payload;
-    }
-
     protected function queryParams() : array
     {
         return $this->request->query();    
@@ -53,7 +30,6 @@ trait RequestTrait
             $payload,
             array_flip($this->getFillable())
         );
-        $payload = $this->transform($payload);
         return $payload;
     }
 }

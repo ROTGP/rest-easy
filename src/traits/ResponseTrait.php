@@ -17,7 +17,6 @@ trait ResponseTrait
     protected function cleanUp()
     {
         $this->disableListening();
-        event('eloquent.cleanUp', null);
     }
 
     protected function successfulResponse($response) : Response
@@ -29,7 +28,6 @@ trait ResponseTrait
          * model event listening, so that models may be queried
          * in did/after hooks.
          */
-        $this->disableListening();
 
         $actionMethod = Route::getCurrentRoute()->getActionMethod();
         $method = Str::studly($this->method);

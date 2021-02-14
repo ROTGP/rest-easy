@@ -17,7 +17,6 @@ class RestEasyServiceProvider extends ServiceProvider
      */
     public function boot(Router $router, Kernel $kernel)
     {        
-        // $kernel = $this->app->make(Kernel::class);
         $kernel->pushMiddleware(RestEasyMiddleware::class);
     }
 }

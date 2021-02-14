@@ -39,15 +39,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // protected $transformations = [
-    //     'phone_number' => 'make_foo'
-    // ];
-
-    // protected function transformMakeFoo($x)
-    // {
-    //     return $x . '666';
-    // }
-
     protected function validationRules($authUser)
     {
         return [
