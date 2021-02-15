@@ -40,7 +40,7 @@ class Album extends Model
 
     public function safeRelationships($authUser)
     {
-        return ['artist', 'genre', 'users'];
+        return ['artist', 'genre', 'users', 'artist.record_label'];
     }
 
     public function safeSyncRelationships($authUser)
@@ -101,7 +101,7 @@ class Album extends Model
 
     public function canRead($authUser)
     {
-        return in_array($authUser->id, [1, 2]) ? true : ErrorCodes::USER_NOT_AUTHORIZED_TO_ACCESS_ALBUM;
+        return in_array($authUser->id, [1, 2, 9]) ? true : ErrorCodes::USER_NOT_AUTHORIZED_TO_ACCESS_ALBUM;
     }
 
     public function canCreate($authUser)

@@ -81,6 +81,17 @@ class WithRelationshipsTest extends IntegrationTestCase
         $this->assertEquals('epic', $json['record_label']['name']);
     }
 
+    public function testThatGetWithNestedRelationshipsAndAuthUserOneReturnsNestedRelationship()
+    {
+        $id = 5;
+        $query = 'albums/' . $id . '?with=artist.record_label'; 
+        $response = $this->asUser(1)->json('GET', $query);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayHasKey('artist', $json);
+        $this->assertArrayHasKey('record_label', $json['artist']);
+        $this->assertEquals(1, $json['artist']['record_label']['id']);
+    }
+
     public function testThatGetWithRelationshipsAndAuthUserTwoReturnsRelationships()
     {
         $query = 'artists/5?with=record_label,users,albums,foo';
@@ -176,25 +187,25 @@ class WithRelationshipsTest extends IntegrationTestCase
                 'record_label_id' => 3,
             ])
             ->assertStatus(201);
-        $entity = $response->decodeResponseJson();
-        $this->assertArrayHasKey('record_label', $entity);
-        $this->assertArrayHasKey('users', $entity);
-        $this->assertArrayHasKey('albums', $entity);
-        $this->assertArrayNotHasKey('foo', $entity);
-        $this->assertEquals('aftermath', $entity['record_label']['name']);
+        $json = $response->decodeResponseJson();
+        $this->assertArrayHasKey('record_label', $json);
+        $this->assertArrayHasKey('users', $json);
+        $this->assertArrayHasKey('albums', $json);
+        $this->assertArrayNotHasKey('foo', $json);
+        $this->assertEquals('aftermath', $json['record_label']['name']);
     }
 
     public function testWithCount()
     {
         $query = 'artists/6?with_count=record_label,users,albums&with=users';
         $response = $this->asUser(1)->get($query);
-        $artist = $this->decodeResponse($response);
-        $this->assertArrayHasKey('record_label_count', $artist);
-        $this->assertEquals(1, $artist['record_label_count']);
-        $this->assertArrayHasKey('users_count', $artist);
-        $this->assertEquals(3, $artist['users_count']);
-        $this->assertArrayHasKey('albums_count', $artist);
-        $this->assertEquals(2, $artist['albums_count']);
-        $this->assertCount(3, $artist['users']);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayHasKey('record_label_count', $json);
+        $this->assertEquals(1, $json['record_label_count']);
+        $this->assertArrayHasKey('users_count', $json);
+        $this->assertEquals(3, $json['users_count']);
+        $this->assertArrayHasKey('albums_count', $json);
+        $this->assertEquals(2, $json['albums_count']);
+        $this->assertCount(3, $json['users']);
     }
 }

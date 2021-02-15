@@ -252,4 +252,28 @@ class PermissionsTest extends IntegrationTestCase
         $this->asUser(2)->get('artists/' . $id)
             ->assertStatus(200);
     }
+
+    public function testThatGetWithRelatedEntitiesFailsWhenPrimaryModelHasPermissionButRelatedEntitiesDoNot()
+    {
+        // user 9 may access albums and users, but not when the
+        // album's user has an id of 8.
+        $id = 5;
+        $query = 'albums/' . $id . '?with=users'; // artist.record_label
+        $response = $this->asUser(9)->json('GET', $query);
+        $json = $this->decodeResponse($response);
+        $this->assertForbidden($response);
+
+
+        // this test will pass because the user with id of 8
+        // is not being accessed
+        $id = 4;
+        $query = 'albums/' . $id . '?with=users';
+        $response = $this->asUser(9)->json('GET', $query);
+        
+        $response->assertStatus(200);
+
+        $json = $this->decodeResponse($response);
+        $this->assertEquals($id, $json['id']);
+        $this->assertEquals(2, $json['users'][0]['id']);
+    }
 }

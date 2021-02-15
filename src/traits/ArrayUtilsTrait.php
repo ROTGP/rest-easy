@@ -11,9 +11,21 @@ trait ArrayUtilsTrait
 {      
     protected function toCamelArray($arr)
     {
-        for($i = 0; $i < sizeof($arr); $i++)
-            $arr[$i] = Str::camel($arr[$i]);
-        return $arr; 
+        // for($i = 0; $i < sizeof($arr); $i++)
+        //     $arr[$i] = Str::camel($arr[$i]);
+        // return $arr; 
+
+        for ($i = 0; $i < sizeof($arr); $i++) {
+            if (strpos($arr[$i], '.') !== false) {
+                $pieces = explode('.', $arr[$i]);
+                for ($j = 0; $j < sizeof($pieces); $j++)
+                    $pieces[$j] = Str::camel($pieces[$j]);
+                $arr[$i] = implode('.', $pieces);
+            } else {
+                $arr[$i] = Str::camel($arr[$i]);
+            }
+        }
+        return $arr;
     }
 
     protected function toSnakeArray($arr)

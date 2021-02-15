@@ -60,20 +60,11 @@ trait QueryTrait
 
     protected function getSafeRelationships() : array
     {
-        $safeRelationships = $this->callProtectedMethod(
+        return $this->callProtectedMethod(
             $this->queriedModel(),
             'safeRelationships',
             $this->getAuthUser()
         ) ?? [];
-
-        if (empty($safeRelationships))
-            return [];
-
-        $relationships = $this->toCamelArray($safeRelationships);
-        return array_intersect(
-            $relationships,
-            $this->getModelMethods()
-        );
     }
     
     public function applyScopes() : void
@@ -248,8 +239,6 @@ trait QueryTrait
 
     public function applyWiths() : void
     {
-        // @TODO provide option to query all relationships, scopes etc
-        // without explicit permission
         $safeRelationships = $this->getSafeRelationships();
         if (empty($safeRelationships))
             return;
@@ -265,10 +254,12 @@ trait QueryTrait
         $withs = $queryParams['with'];
         if (empty($withs) || !is_string($withs))
             return;
-        $withs = array_values(
-            array_intersect(
-                $this->toCamelArray(explode(',', $withs)),
-                $safeRelationships
+        $withs = $this->toCamelArray(
+            array_values(
+                array_intersect(
+                    explode(',', $withs),
+                    $safeRelationships
+                )
             )
         );
         if (sizeof($withs) === 0)
@@ -284,10 +275,12 @@ trait QueryTrait
         $withs = $queryParams['with_count'];
         if (empty($withs) || !is_string($withs))
             return;
-        $withs = array_values(
-            array_intersect(
-                $this->toCamelArray(explode(',', $withs)),
-                $safeRelationships
+        $withs = $this->toCamelArray(
+            array_values(
+                array_intersect(
+                    explode(',', $withs),
+                    $safeRelationships
+                )
             )
         );
         if (sizeof($withs) === 0)
