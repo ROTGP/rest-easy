@@ -255,10 +255,10 @@ class PermissionsTest extends IntegrationTestCase
 
     public function testThatGetWithRelatedEntitiesFailsWhenPrimaryModelHasPermissionButRelatedEntitiesDoNot()
     {
-        // user 9 may access albums and users, but not when the
+        // user 9 may access albums and its users, but not when the
         // album's user has an id of 8.
         $id = 5;
-        $query = 'albums/' . $id . '?with=users'; // artist.record_label
+        $query = 'albums/' . $id . '?with=users';
         $response = $this->asUser(9)->json('GET', $query);
         $json = $this->decodeResponse($response);
         $this->assertForbidden($response);
@@ -269,11 +269,35 @@ class PermissionsTest extends IntegrationTestCase
         $id = 4;
         $query = 'albums/' . $id . '?with=users';
         $response = $this->asUser(9)->json('GET', $query);
-        
         $response->assertStatus(200);
 
         $json = $this->decodeResponse($response);
         $this->assertEquals($id, $json['id']);
         $this->assertEquals(2, $json['users'][0]['id']);
+    }
+
+    public function testThatGetWithRelatedEntitiesFailsWhenPrimaryModelHasPermissionButNestedRelatedEntitiesDoNot()
+    {
+        $id = 5;
+        $query = 'albums/' . $id . '?with=artist.record_label'; 
+        $response = $this->asUser(1)->json('GET', $query);
+        $response->assertStatus(200);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayHasKey('artist', $json);
+        $this->assertArrayHasKey('record_label', $json['artist']);
+        $this->assertEquals(1, $json['artist']['record_label']['id']);
+
+        $id = 20;
+        $query = 'albums/' . $id . '?with=artist.record_label'; 
+        $response = $this->asUser(9)->json('GET', $query);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayHasKey('http_status_code', $json);
+        $this->assertArrayHasKey('http_status_message', $json);
+        $this->assertArrayHasKey('error_code', $json);
+        $this->assertArrayHasKey('error_message', $json);
+        $this->assertEquals(403, $json['http_status_code']);
+        $this->assertEquals('Forbidden', $json['http_status_message']);
+        $this->assertEquals(2, $json['error_code']);
+        $this->assertEquals('User not authorized to access record label', $json['error_message']);
     }
 }

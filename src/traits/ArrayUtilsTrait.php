@@ -11,10 +11,6 @@ trait ArrayUtilsTrait
 {      
     protected function toCamelArray($arr)
     {
-        // for($i = 0; $i < sizeof($arr); $i++)
-        //     $arr[$i] = Str::camel($arr[$i]);
-        // return $arr; 
-
         for ($i = 0; $i < sizeof($arr); $i++) {
             if (strpos($arr[$i], '.') !== false) {
                 $pieces = explode('.', $arr[$i]);

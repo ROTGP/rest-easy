@@ -3,6 +3,7 @@
 namespace ROTGP\RestEasy\Test\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use ROTGP\RestEasy\Test\ErrorCodes;
 
 class RecordLabel extends Model
 {
@@ -17,8 +18,15 @@ class RecordLabel extends Model
 
     public $timestamps = false;
 
+    public function artists()
+    {
+        return $this->hasMany(Artist::class);
+    }
+
     public function canRead($authUser)
     {
+        if ($authUser->id === 9)
+            return ErrorCodes::USER_NOT_AUTHORIZED_TO_ACCESS_RECORD_LABEL;
         return true;
     }
 }
