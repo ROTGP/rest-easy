@@ -38,7 +38,7 @@ trait QueryTrait
 
     protected function getSafeScopes() : array
     {
-        $safeScopes = $this->callProtectedMethod(
+        $safeScopes = $this->callModelMethod(
             $this->queriedModel(),
             'safeScopes',
             $this->getAuthUser()
@@ -60,7 +60,7 @@ trait QueryTrait
 
     protected function getSafeRelationships() : array
     {
-        return $this->callProtectedMethod(
+        return $this->callModelMethod(
             $this->queriedModel(),
             'safeRelationships',
             $this->getAuthUser()

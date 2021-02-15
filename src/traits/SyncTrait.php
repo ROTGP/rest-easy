@@ -16,7 +16,7 @@ trait SyncTrait
 {  
     protected function applySyncs($queriedModel, $authUser)
     {
-        $safeSyncRelationships = $this->callProtectedMethod(
+        $safeSyncRelationships = $this->callModelMethod(
             $this->queriedModel(),
             'safeSyncRelationships',
             $authUser

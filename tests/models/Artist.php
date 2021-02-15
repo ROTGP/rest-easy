@@ -22,7 +22,7 @@ class Artist extends Model
         'record_label_id' => 'int'
     ];
 
-    protected function validationRules($authUser)
+    public function validationRules($authUser)
     {
         return [
             'name' => 'required|unique',

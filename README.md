@@ -144,7 +144,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Foo extends Model
 {
-    protected function validationRules($authUser)
+    public function validationRules($authUser)
     {
         return [
             'name' => 'required|unique',
@@ -172,7 +172,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Foo extends Model
 {
-    protected function validationRules($authUser)
+    public function validationRules($authUser)
     {
         return [
             'name' => 'required|unique|not_reserved:foo,bar',

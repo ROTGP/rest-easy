@@ -16,7 +16,7 @@ class Album extends Model
         'purchases' 
     ];
 
-    protected function validationRules($authUser)
+    public function validationRules($authUser)
     {
         return [
             'name' => 'required|unique|does_not_contain_genre_name',

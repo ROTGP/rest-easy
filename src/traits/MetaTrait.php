@@ -71,7 +71,8 @@ trait MetaTrait
 
     public function getImmutableFields() : array
     {
-        return $this->callProtectedMethod(
+
+        return $this->callModelMethod(
             $this->queriedModel(),
             'immutableFields',
             $this->getAuthUser()
@@ -83,17 +84,6 @@ trait MetaTrait
         if ($this->columns === null)
             $this->columns = Schema::getColumnListing($this->model->getTable());
         return $this->columns;
-    }
-
-    protected function accessProtectedProperty($prop, $default = [])
-    {
-        $obj = $this->model;
-        $reflection = new ReflectionClass($obj);
-        if (!$reflection->hasProperty($prop))
-            return $default;
-        $property = $reflection->getProperty($prop);
-        $property->setAccessible(true);
-        return $property->getValue($obj) ?? [];
     }
 
     protected function will($verb, $payload)
@@ -121,14 +111,11 @@ trait MetaTrait
         return $this->queriedModel ?? $this->model;
     }
 
-    protected function callProtectedMethod(Model $model, string $methodName, ...$params)
+    protected function callModelMethod(Model $model, string $methodName, ...$params)
     {
-        $reflection = new ReflectionClass($model);
-        if (!$reflection->hasMethod($methodName))
+        if (!method_exists($model, $methodName))
             return null;
-        $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
-        return $method->invoke($model, ...$params);
+        return $model->{$methodName}(...$params);
     }
 
     /**

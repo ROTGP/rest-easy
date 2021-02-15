@@ -145,7 +145,7 @@ trait PermissionTrait
             // temporarily disable listening as the permission
             // method may make eloquent queries
             $this->disableListening();
-            $allowed = $this->callProtectedMethod(
+            $allowed = $this->callModelMethod(
                 $model,
                 $permissionMethodName,
                 ...$params

@@ -17,7 +17,7 @@ trait ValidationTrait
 {      
     protected function performValidation($model)
     {
-        $rules = $this->callProtectedMethod(
+        $rules = $this->callModelMethod(
             $model,
             'validationRules',
             ...[$this->getAuthUser(),
@@ -91,7 +91,7 @@ trait ValidationTrait
                 $payload = $prunedPayload[$field] ?? null;
                 
                 $invocationParams = [$field, $payload, $rule['params']];
-                $error = $this->callProtectedMethod(
+                $error = $this->callModelMethod(
                     $model,
                     $rule['rule'],
                     ...$invocationParams
@@ -108,7 +108,7 @@ trait ValidationTrait
                 if (in_array($ruleName, $modelMethods) === false)
                     continue;
                 $invocationParams = ['model', optional($fullPayload), $params];
-                $error = $this->callProtectedMethod(
+                $error = $this->callModelMethod(
                     $model,
                     $ruleName,
                     ...$invocationParams

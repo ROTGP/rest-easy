@@ -39,7 +39,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected function validationRules($authUser)
+    public function validationRules($authUser)
     {
         return [
             'username' => 'required|unique',
