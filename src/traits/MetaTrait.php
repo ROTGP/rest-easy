@@ -103,15 +103,15 @@ trait MetaTrait
         $this->enableListening();
     }
 
-    protected function findModel($id, bool $disableEvents = false) : Model
+    protected function findModel($key, bool $disableEvents = false) : Model
     {
         if ($disableEvents)
             $this->disableListening();
-        $model = $this->model->find($id);
+        $model = $this->model->find($key);
         if ($disableEvents)
             $this->enableListening();
         if ($model === null)
-            $this->errorResponse(null, Response::HTTP_NOT_FOUND, ['resource_id' => $id]);
+            $this->errorResponse(null, Response::HTTP_NOT_FOUND, ['resource_key' => $key]);
         $this->queriedModel = $model;
         return $this->queriedModel;
     }
@@ -212,18 +212,18 @@ trait MetaTrait
         return $methods;
     }
 
-    protected function getModel($id, $returnImmediately = false)
+    protected function getModel($key, $returnImmediately = false)
     {
-        $queriedModel = $this->findModel($id, false);
+        $queriedModel = $this->findModel($key, false);
         if ($returnImmediately)
             return $queriedModel;
         if (empty($this->queryParams())) {
             $this->will('Get', $queriedModel);
             return $queriedModel;
         }   
-        $this->query->where($this->model->getKeyName(), $id);
+        $this->query->where($this->model->getKeyName(), $key);
         $this->applySyncs($queriedModel, $this->getAuthUser());
-        $model = $this->applyQueryFilters($id)->first();
+        $model = $this->applyQueryFilters($key)->first();
         $this->will('Get', $model);
         return $model;
     }

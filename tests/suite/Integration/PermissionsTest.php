@@ -65,12 +65,12 @@ class PermissionsTest extends IntegrationTestCase
             ->assertJsonStructure([
                 'http_status_code',
                 'http_status_message',
-                'resource_id'
+                'resource_key'
             ])
             ->assertJsonFragment([
                 'http_status_code' => 404,
                 'http_status_message' => 'Not Found',
-                'resource_id' => $id
+                'resource_key' => $id
             ])
             ->assertStatus(404);
     }
@@ -299,5 +299,12 @@ class PermissionsTest extends IntegrationTestCase
         $this->assertEquals('Forbidden', $json['http_status_message']);
         $this->assertEquals(2, $json['error_code']);
         $this->assertEquals('User not authorized to access record label', $json['error_message']);
+    }
+
+    public function testThatErrorIsNotFoundWhenResourceDoesNotExistAndNoPermissionExists()
+    {
+        $id = 10000;
+        $query = 'albums/' . $id;
+        $this->asUser(3)->json('GET', $query)->assertStatus(404);
     }
 }

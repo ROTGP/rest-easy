@@ -150,12 +150,12 @@ class BatchTest extends IntegrationTestCase
             ->assertJsonStructure([
                 'http_status_code',
                 'http_status_message',
-                'resource_id'
+                'resource_key'
             ])
             ->assertJsonFragment([
                 'http_status_code' => 404,
                 'http_status_message' => 'Not Found',
-                'resource_id' => 2
+                'resource_key' => 2
             ])
             ->assertStatus(404);
 
@@ -222,12 +222,12 @@ class BatchTest extends IntegrationTestCase
             ->assertJsonStructure([
                 'http_status_code',
                 'http_status_message',
-                'resource_id'
+                'resource_key'
             ])
             ->assertJsonFragment([
                 'http_status_code' => 404,
                 'http_status_message' => 'Not Found',
-                'resource_id' => $id
+                'resource_key' => $id
             ])
             ->assertStatus(404);
         
