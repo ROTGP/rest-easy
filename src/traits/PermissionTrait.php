@@ -60,24 +60,24 @@ trait PermissionTrait
     protected function startEloquentGuard() : void
     {
         if ($this->guardModels($this->getAuthUser()) !== true) {
-            $this->disableListening();
+            $this->disableListeningForModelEvents();
             return;
         }
-        $this->enableListening();
+        $this->enableListeningForModelEvents();
         if (!$this->listenerAdded) {
             Event::listen('eloquent.*', Closure::fromCallable([$this, 'onModelEvent']));
             $this->listenerAdded = true;
         }
     }
 
-    protected function enableListening()
+    protected function enableListeningForModelEvents()
     {
-        $this->listening = true;
+        $this->listeningForModelEvents = true;
     }
 
-    protected function disableListening()
+    protected function disableListeningForModelEvents()
     {
-        $this->listening = false;
+        $this->listeningForModelEvents = false;
     }
 
     /**
@@ -111,7 +111,7 @@ trait PermissionTrait
 
     protected function onModelEvent($eventName, array $data)
     {
-        if ($this->listening === false)
+        if ($this->listeningForModelEvents === false)
             return;
         $event = trim(strstr(strstr($eventName, '.'), ':', true), '.:');
         if (!in_array($event, $this->eventNames))
@@ -120,12 +120,12 @@ trait PermissionTrait
         $secondaryModel = $data[1] ?? null;
 
         // @TODO
-        // $this->disableListening();
+        // $this->disableListeningForModelEvents();
         // $hookName = $this->getHookName($event);
         // echo $hookName . "\n";
         // if (method_exists($model, $hookName))
         //     $model->{$hookName}();
-        // $this->enableListening();
+        // $this->enableListeningForModelEvents();
         
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)
@@ -144,13 +144,13 @@ trait PermissionTrait
                 array_unshift($params, $secondaryModel);
             // temporarily disable listening as the permission
             // method may make eloquent queries
-            $this->disableListening();
+            $this->disableListeningForModelEvents();
             $allowed = $this->callModelMethod(
                 $model,
                 $permissionMethodName,
                 ...$params
             );
-            $this->enableListening();
+            $this->enableListeningForModelEvents();
         }
         
         if ($allowed === true)

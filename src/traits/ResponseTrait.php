@@ -16,7 +16,7 @@ trait ResponseTrait
 {      
     protected function cleanUp()
     {
-        $this->disableListening();
+        $this->disableListeningForModelEvents();
     }
 
     protected function successfulResponse($response) : Response

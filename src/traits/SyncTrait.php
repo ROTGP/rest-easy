@@ -66,16 +66,16 @@ trait SyncTrait
                 }
 
                 if (sizeof($attaching) > 0) {
-                    $this->disableListening();
+                    $this->disableListeningForModelEvents();
                     $modelsToAttach = $belongsToMany->getRelated()->find($attaching)->unique();
-                    $this->enableListening();
+                    $this->enableListeningForModelEvents();
                 }
                     
 
                 if (sizeof($detaching) > 0) {
-                    $this->disableListening();
+                    $this->disableListeningForModelEvents();
                     $modelsToDetach = $belongsToMany->getRelated()->find($detaching)->unique();
-                    $this->enableListening();
+                    $this->enableListeningForModelEvents();
                 }
                     
                 foreach ($modelsToAttach as $modelToAttach) {

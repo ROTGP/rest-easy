@@ -88,18 +88,18 @@ trait MetaTrait
 
     protected function will($verb, $payload)
     {
-        $this->disableListening();
+        $this->disableListeningForModelEvents();
         $this->{'will' . $verb}($payload);
-        $this->enableListening();
+        $this->enableListeningForModelEvents();
     }
 
     protected function findModel($key, bool $disableEvents = false) : Model
     {
         if ($disableEvents)
-            $this->disableListening();
+            $this->disableListeningForModelEvents();
         $model = $this->model->find($key);
         if ($disableEvents)
-            $this->enableListening();
+            $this->enableListeningForModelEvents();
         if ($model === null)
             $this->errorResponse(null, Response::HTTP_NOT_FOUND, ['resource_key' => $key]);
         $this->queriedModel = $model;

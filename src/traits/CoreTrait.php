@@ -132,9 +132,9 @@ trait CoreTrait
 
                 $this->will('Update', $queriedModel);
                 $queriedModel->save();
-                $this->disableListening();
+                $this->disableListeningForModelEvents();
                 $queriedModel->refresh();
-                $this->enableListening();
+                $this->enableListeningForModelEvents();
                 if (empty($this->queryParams())) {
                     $result[] = $queriedModel;
                     continue;
@@ -198,9 +198,9 @@ trait CoreTrait
                 
                 $this->will('Create', $newModel);
                 $newModel->save();
-                $this->disableListening();
+                $this->disableListeningForModelEvents();
                 $newModel->refresh();
-                $this->enableListening();
+                $this->enableListeningForModelEvents();
                 if (empty($this->queryParams())) {
                     $result[] = $newModel;
                     continue;
