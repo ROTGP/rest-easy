@@ -191,14 +191,15 @@ trait PermissionTrait
         $verb = $this->eventActions[$event];
         $message = $authUser->getKey() === null ? 'Unauthenticated user' : 'Authenticated user with key ' . $authUser->getKey();
         $message .= ' was denied permission to ' . $verb;
+        
         if ($secondaryModel !== null) {
-            $message .= ' model ' . (new ReflectionClass($secondaryModel))->getShortName();
+            $message .= ' model ' . class_basename($secondaryModel);
             $message .= ' with key ' . $secondaryModel->getKey() . ' ';
             $syncVerb = $verb === 'attach' ? 'to' : 'from';
-            $message .=  $syncVerb . ' model ' . (new ReflectionClass($model))->getShortName();
+            $message .=  $syncVerb . ' model ' . class_basename($model);
             $message .= ' with key ' . $model->getKey();
         } else {
-            $message .= ' model ' . (new ReflectionClass($model))->getShortName();
+            $message .= ' model ' . class_basename($model);
             if ($model->getKey() !== null) $message .= ' with key ' . $model->getKey();
         }
 

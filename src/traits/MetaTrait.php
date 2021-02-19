@@ -144,8 +144,8 @@ trait MetaTrait
             $this->model = app($namespace);
             return $this->model;
         }
-       
-        $modelName = $this->shortName();
+        
+        $modelName = class_basename($this);
         $singularized = Str::singular(
             str_replace('Controller', '', $modelName)
         );
@@ -169,11 +169,6 @@ trait MetaTrait
         if ($model === null)
             throw new Exception('Unable to determine model');
         return app($model);
-    }
-
-    private function shortName()
-    {
-        return (new ReflectionClass($this))->getShortName();
     }
 
     /**
