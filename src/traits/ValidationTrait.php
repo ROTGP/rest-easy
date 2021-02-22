@@ -49,7 +49,6 @@ trait ValidationTrait
         
         $prunedPayload = $this->payload(true, $model);
         $fullPayload = $this->payload(false, $model);
-        $modelMethods = $this->getModelMethods();
         $customFieldRules = [];
         $safeRules = [];
         $fillable = $this->getFillable($model);
@@ -58,7 +57,7 @@ trait ValidationTrait
             for ($i = 0; $i < sizeof($fieldParts); $i++) {
                 $subParts = explode(':', $fieldParts[$i]);
                 $ruleName = 'validate' . Str::studly($subParts[0]);
-                if (in_array($ruleName, $modelMethods) && $field !== 'model' && in_array($field, $fillable)) {
+                if (method_exists($model, $ruleName) && $field !== 'model' && in_array($field, $fillable)) {
                     $customFieldRules[] = [
                         'field' => $field,
                         'rule' => $ruleName,
@@ -81,7 +80,6 @@ trait ValidationTrait
         $validator->after(function ($validator) use (
             $modelRules,
             $customFieldRules,
-            $modelMethods,
             $fullPayload,
             $prunedPayload,
             $model) 
@@ -105,7 +103,7 @@ trait ValidationTrait
 
             foreach ($modelRules as $rule => $params) {
                 $ruleName = 'validate' . Str::studly($rule);
-                if (in_array($ruleName, $modelMethods) === false)
+                if (method_exists($model, $ruleName) === false)
                     continue;
                 $invocationParams = ['model', optional($fullPayload), $params];
                 $error = $this->callModelMethod(

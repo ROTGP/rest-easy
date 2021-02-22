@@ -16,7 +16,6 @@ trait ResponseTrait
 {      
     protected function cleanUp()
     {
-        $this->modelMethods = null;
         $this->columns = null;
         $this->queriedModel = null;
         $this->batchPayloadKeys = [];

@@ -43,7 +43,6 @@ trait QueryTrait
             'safeScopes',
             $this->getAuthUser()
         ) ?? [];
-
         if (empty($safeScopes))
             return [];
         
@@ -52,10 +51,7 @@ trait QueryTrait
             return [];
         for($i = 0; $i < sizeof($scopes); $i++)
             $scopes[$i] = 'scope' . $scopes[$i];
-        return array_intersect(
-            $scopes,
-            $this->getModelMethods()
-        );
+        return $scopes;
     }
 
     protected function getSafeRelationships() : array
@@ -69,7 +65,7 @@ trait QueryTrait
     
     public function applyScopes() : void
     {
-        if (in_array('scopeImplicit', $this->getModelMethods()))
+        if (method_exists($this->model, 'scopeImplicit'))
             $this->query->{'implicit'}(
                 $this->authUser,
                 $this->payload(),

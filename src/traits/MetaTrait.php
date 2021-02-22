@@ -13,8 +13,7 @@ use Exception;
 use Str;
 
 trait MetaTrait
-{      
-    protected $modelMethods;
+{
     protected $columns;
     protected $queriedModel;
     protected $batchPayloadKeys = [];
@@ -169,29 +168,6 @@ trait MetaTrait
         if ($model === null)
             throw new Exception('Unable to determine model');
         return app($model);
-    }
-
-    /**
-     * Returns a list of function names that are both
-     * public, and belong to either BaseModel, or a 
-     * class that extends it.
-     *
-     * @return array
-     */
-    protected function getModelMethods() : array
-    {  
-        if ($this->modelMethods !== null)
-            return $this->modelMethods;
-        $class = new ReflectionClass($this->model);
-        $allMethods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-        $methods = [];
-        foreach ($allMethods as $method) {
-            $methodClassNamespace = substr($method->class, 0, strrpos($method->class, '\\'));
-            if ($class->getNamespaceName() === $methodClassNamespace)
-                $methods[] = $method->name;
-        }
-        $this->modelMethods = $methods;
-        return $methods;
     }
 
     public function findBatchPayload($key, $payload)
