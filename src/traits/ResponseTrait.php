@@ -16,6 +16,14 @@ trait ResponseTrait
 {      
     protected function cleanUp()
     {
+        $this->modelMethods = null;
+        $this->columns = null;
+        $this->queriedModel = null;
+        $this->batchPayloadKeys = [];
+        $this->appliedAggregateFunctions = [];
+        $this->appliedGroupBy = [];
+        $this->appliedWithCount = [];
+        
         $this->disableListeningForModelEvents();
     }
 
