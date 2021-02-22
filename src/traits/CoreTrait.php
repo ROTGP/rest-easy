@@ -74,10 +74,21 @@ trait CoreTrait
     {
         $this->init($request);
         $keys = $this->parseKeys($resource);
-        $responseModels = [];
-        foreach ($keys as $key)
-            $responseModels[] = $this->getModel($key);
-        return $this->successfulResponse($responseModels);
+        $queriedModels = [];
+        foreach ($keys as $key) {
+            $queriedModel = $this->findModel($key, false);
+            if (empty($this->queryParams())) {
+                $this->will('Get', $queriedModel);
+                $queriedModels[] = $queriedModel;
+                continue;
+            }   
+            $this->query->where($this->model->getKeyName(), $key);
+            $this->applySyncs($queriedModel, $this->getAuthUser());
+            $model = $this->applyQueryFilters($key)->first();
+            $this->will('Get', $model);
+            $queriedModels[] = $model;
+        }
+        return $this->successfulResponse($queriedModels);
     }
 
      /**

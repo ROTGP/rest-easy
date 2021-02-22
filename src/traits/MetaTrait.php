@@ -194,22 +194,6 @@ trait MetaTrait
         return $methods;
     }
 
-    protected function getModel($key, $returnImmediately = false)
-    {
-        $queriedModel = $this->findModel($key, false);
-        if ($returnImmediately)
-            return $queriedModel;
-        if (empty($this->queryParams())) {
-            $this->will('Get', $queriedModel);
-            return $queriedModel;
-        }   
-        $this->query->where($this->model->getKeyName(), $key);
-        $this->applySyncs($queriedModel, $this->getAuthUser());
-        $model = $this->applyQueryFilters($key)->first();
-        $this->will('Get', $model);
-        return $model;
-    }
-
     public function findBatchPayload($key, $payload)
     {
         $keyName = $this->model->getKeyName();
