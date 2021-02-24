@@ -125,7 +125,7 @@ trait ValidationTrait
         return $validator->messages()->messages();
     }
 
-    protected function useBatchKeys() : bool
+    protected function useBatchKeys()
     {
         return true;
     }

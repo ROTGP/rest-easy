@@ -85,8 +85,17 @@ trait MetaTrait
         return $this->columns;
     }
 
-    protected function will($verb, $payload)
+    protected function will($payload)
     {
+        $verb = $this->methodAlias;
+
+        if ($verb !== 'List')
+            $payload = collect($payload);
+
+        if (!$this->isBatch && $verb !== 'List') $payload = $payload[0];
+        if ($this->isBatch)
+            $verb .= 'Batch';
+        
         $this->disableListeningForModelEvents();
         $this->{'will' . $verb}($payload);
         $this->enableListeningForModelEvents();

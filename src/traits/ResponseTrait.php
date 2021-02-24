@@ -7,13 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 
-use Route;
 use Exception;
 use ReflectionClass;
 use Str;
 
 trait ResponseTrait
-{      
+{   
+    protected $methodAliases = [
+        'index' => 'List',
+        'show' => 'Get',
+        'update' => 'Update',
+        'store' => 'Create',
+        'destroy' => 'Delete'
+    ];
+
     protected function cleanUp()
     {
         $this->columns = null;
@@ -28,40 +35,32 @@ trait ResponseTrait
 
     protected function successfulResponse($response) : Response
     {
-        $this->cleanUp();
         /**
          * Now that we have our response and all user-initiated
          * requests have been resolved, it's safe to disable 
          * model event listening, so that models may be queried
          * in did/after hooks.
          */
-
-        $actionMethod = Route::getCurrentRoute()->getActionMethod();
-        $method = Str::studly($this->method);
-        
-        if ($method === 'Index') {
-            $method = 'Get';
-        } else if ($method === 'Post') {
-            $method = 'Create';
-        } else if ($method === 'Put') {
-            $method = 'Update';
-        }
-        $action = 'did' . $method;
-        $didCollection = collect($response);
-    
-        foreach ($didCollection as $model) {
+        $this->cleanUp();
+        $response = collect($response);
+        $isAggregate = false;
+        foreach ($response as $model) {
             // models with no key are excluded, as they're likely aggregates
-            if ((is_a($model, Model::class) && $model->getKey() == null) || !is_a($model, Model::class)) continue;
-            event('resteasy.after', [$action, $model]);
-            $this->{$action}($model);
-        }
-        
-        if ($actionMethod !== 'index' && (is_a($response, Collection::class) || 
-            is_array($response)) && !$this->isBatch && count($response) === 1) {
-            $response = $response[0];
+            if ((is_a($model, Model::class) && $model->getKey() == null) || !is_a($model, Model::class)) {
+                $isAggregate = true;
+                break;
+            }
         }
 
-        if ($method === 'Delete')
+        if (!$this->isBatch && $this->methodAlias !== 'List') $response = $response[0];
+        
+        if (!$isAggregate) {
+            $batchString = $this->isBatch ? 'Batch' : '';
+            $this->{'did' . $this->methodAlias . $batchString}($response);
+            event('resteasy.after', ['after' . $this->methodAlias . $batchString, $response]);
+        }
+        
+        if ($this->methodAlias === 'Delete')
             return response()->json(null, $this->successfulHttpCode());
 
         return response()->json($response, $this->successfulHttpCode());

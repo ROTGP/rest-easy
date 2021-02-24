@@ -3,8 +3,10 @@
 namespace ROTGP\RestEasy\Traits;
 
 trait HooksTrait
-{  
-    public function willList($query)
+{ 
+    // WILL
+    
+    public function willList($queryBuilder)
     {
         //
     }
@@ -14,12 +16,27 @@ trait HooksTrait
         //
     }
 
+    public function willGetBatch($collection)
+    {
+        //
+    }
+
     public function willUpdate($model)
     {
         //
     }
 
-    public function willCreate($newModel)
+    public function willUpdateBatch($collection)
+    {
+        //
+    }
+
+    public function willCreate($model)
+    {
+        //
+    }
+
+    public function willCreateBatch($collection)
     {
         //
     }
@@ -29,8 +46,24 @@ trait HooksTrait
         //
     }
 
-    // @TODO add tests for all 'did' hooks
+    public function willDeleteBatch($collection)
+    {
+        //
+    }
+    
+    // DID
+    
+    public function didList($collection)
+    {
+        //
+    }
+
     public function didGet($model)
+    {
+        //
+    }
+
+    public function didGetBatch($collection)
     {
         //
     }
@@ -40,7 +73,17 @@ trait HooksTrait
         //
     }
 
-    public function didCreate($newModel)
+    public function didUpdateBatch($collection)
+    {
+        //
+    }
+
+    public function didCreate($model)
+    {
+        //
+    }
+
+    public function didCreateBatch($collection)
     {
         //
     }
@@ -50,27 +93,59 @@ trait HooksTrait
         //
     }
 
+    public function didDeleteBatch($collection)
+    {
+        //
+    }
+
+    // AFTER
+
     public function useAfterHooks()
     {
         return false;
     }
 
-    public function didGetAfter($model)
+    public function afterList($collection)
     {
         //
     }
 
-    public function didUpdateAfter($model)
+    public function afterGet($model)
     {
         //
     }
 
-    public function didCreateAfter($newModel)
+    public function afterGetBatch($collection)
     {
         //
     }
 
-    public function didDeleteAfter($model)
+    public function afterUpdate($model)
+    {
+        //
+    }
+
+    public function afterUpdateBatch($collection)
+    {
+        //
+    }
+
+    public function afterCreate($model)
+    {
+        //
+    }
+
+    public function afterCreateBatch($collection)
+    {
+        //
+    }
+
+    public function afterDelete($model)
+    {
+        //
+    }
+
+    public function afterDeleteBatch($collection)
     {
         //
     }

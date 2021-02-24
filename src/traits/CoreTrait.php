@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 
 use DB;
 use ReflectionClass;
+use Route;
 
 trait CoreTrait
 {  
@@ -27,6 +28,7 @@ trait CoreTrait
     protected $authUser;
     protected $query;
     protected $method;
+    protected $methodAlias;
     protected $request;
     protected $isBatch = false;
 
@@ -36,7 +38,11 @@ trait CoreTrait
         $this->authUser = $this->authUser();
         $this->query = $this->model->query();
         $this->method = strtolower($this->request->getMethod());
-        $this->modelNamespace = (new ReflectionClass($this->model))->getNamespaceName();
+        $this->methodAlias = $this->methodAliases[
+            strtolower(Route::getCurrentRoute()->getActionMethod())
+        ];
+        $this->modelNamespace = (new ReflectionClass($this->model))
+            ->getNamespaceName();
         $this->startEloquentGuard();
     }
 
@@ -48,6 +54,8 @@ trait CoreTrait
     public function _index(Request $request)
     {
         $this->init($request);
+        $this->isBatch = false;
+        $this->will($this->query);
         $response = $this->applyQueryFilters();
 
         // when listing and no models are returned
@@ -60,7 +68,6 @@ trait CoreTrait
                     'eloquent.retrieved: ' . get_class($this->model),
                     [$this->model]
                 );
-
         return $this->successfulResponse($response);
     }
 
@@ -75,18 +82,22 @@ trait CoreTrait
         $this->init($request);
         $keys = $this->parseKeys($resource);
         $queriedModels = [];
-        foreach ($keys as $key) {
-            $queriedModel = $this->findModel($key, false);
-            if (empty($this->queryParams())) {
-                $this->will('Get', $queriedModel);
-                $queriedModels[] = $queriedModel;
-                continue;
-            }   
-            $this->query->where($this->model->getKeyName(), $key);
-            $this->applySyncs($queriedModel, $this->getAuthUser());
-            $model = $this->applyQueryFilters($key)->first();
-            $this->will('Get', $model);
-            $queriedModels[] = $model;
+        foreach ($keys as $key)
+            $queriedModels[] = $this->findModel($key, false);
+
+        $this->isBatch = count($queriedModels) > 1;
+        $this->will($queriedModels);
+        
+        if (!empty($this->queryParams())) {
+            $keyName = $this->model->getKeyName();
+            for ($i = 0; $i < count($queriedModels); $i++) {
+                $queriedModel = $queriedModels[$i];
+                $key = $queriedModel->getKey();
+                $this->query->where($keyName, $key);
+                $this->applySyncs($queriedModel, $this->getAuthUser());
+                $queriedModel = $this->applyQueryFilters($key)->first();
+                $queriedModels[$i] = $queriedModel;
+            }
         }
         return $this->successfulResponse($queriedModels);
     }
@@ -121,6 +132,8 @@ trait CoreTrait
                 $queriedModels[] = $queriedModel;
             }
         }
+
+        $this->will($queriedModels);
         
         $responseModels = DB::transaction(function () use ($queriedModels) {
             $validationErrorCollection = [];
@@ -141,7 +154,6 @@ trait CoreTrait
                 if ($hasValidationErrors)
                     continue;
 
-                $this->will('Update', $queriedModel);
                 $queriedModel->save();
                 $this->disableListeningForModelEvents();
                 $queriedModel->refresh();
@@ -188,6 +200,8 @@ trait CoreTrait
         } else {
             $newModels[] = new $this->model($this->payload(true));
         }
+
+        $this->will($newModels);
         
         $responseModels = DB::transaction(function () use ($newModels) {
             $validationErrorCollection = [];
@@ -207,7 +221,6 @@ trait CoreTrait
                 if ($hasValidationErrors)
                     continue;
                 
-                $this->will('Create', $newModel);
                 $newModel->save();
                 $this->disableListeningForModelEvents();
                 $newModel->refresh();
@@ -240,16 +253,19 @@ trait CoreTrait
     public function _destroy(Request $request, $resource)
     {
         $this->init($request);
-        $responseModels = [];
-        DB::transaction(function () use ($resource, &$responseModels) {
-            $keys = $this->parseKeys($resource);
-            foreach ($keys as $key) {
-                $modelToDelete = $this->findModel($key, true);
-                $this->will('Delete', $modelToDelete);
+        $modelsToDelete = [];
+        $keys = $this->parseKeys($resource);
+        foreach ($keys as $key)
+            $modelsToDelete[] = $this->findModel($key, true);
+
+        $this->isBatch = count($modelsToDelete) > 1;
+
+        $this->will($modelsToDelete);
+
+        DB::transaction(function () use (&$modelsToDelete) {
+            foreach ($modelsToDelete as $modelToDelete)
                 $modelToDelete->delete();
-                $responseModels[] = $modelToDelete;
-            }
         });
-        return $this->successfulResponse($responseModels);
+        return $this->successfulResponse($modelsToDelete);
     }
 }

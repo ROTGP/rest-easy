@@ -24,15 +24,12 @@ trait QueryTrait
         $this->applyWiths();
         if ($id !== null) {
             $collection = $this->query->get();
-            if (count($collection) === 1)
-                $this->will('Get', $collection->first());
             return $collection;
         }
         $this->applyScopes();
         $this->applyGroupBy();
         $this->applyAggregations();
         $this->applyOrderBy();
-        $this->will('List', $this->query);
         return $this->applyPagination($this->query);
     }
 
