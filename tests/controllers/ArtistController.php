@@ -8,7 +8,7 @@ class ArtistController extends BaseController
 {
     protected function useBatchKeys()
     {
-        return $this->getAuthUser()->id !== 2;
+        return $this->authUser()->id !== 2;
     }
 
     public function willList($queryBuilder)

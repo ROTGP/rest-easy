@@ -38,7 +38,7 @@ trait QueryTrait
         $safeScopes = $this->callModelMethod(
             $this->queriedModel(),
             'safeScopes',
-            $this->getAuthUser()
+            $this->authUser()
         ) ?? [];
         if (empty($safeScopes))
             return [];
@@ -56,7 +56,7 @@ trait QueryTrait
         return $this->callModelMethod(
             $this->queriedModel(),
             'safeRelationships',
-            $this->getAuthUser()
+            $this->authUser()
         ) ?? [];
     }
     

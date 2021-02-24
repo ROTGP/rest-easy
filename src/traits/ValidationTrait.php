@@ -20,7 +20,7 @@ trait ValidationTrait
         $rules = $this->callModelMethod(
             $model,
             'validationRules',
-            ...[$this->getAuthUser(),
+            ...[$this->authUser(),
             optional($model)->getKey()]
         ) ?? [];
         $modelRules = [];

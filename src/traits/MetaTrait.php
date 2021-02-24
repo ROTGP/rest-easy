@@ -32,12 +32,7 @@ trait MetaTrait
 
     protected function authUser()
     {
-        return auth()->user();
-    }
-
-    final protected function getAuthUser()
-    {
-        return optional($this->authUser);
+        return optional(auth()->user());
     }
     
     protected function errorCodes()
@@ -74,7 +69,7 @@ trait MetaTrait
         return $this->callModelMethod(
             $this->queriedModel(),
             'immutableFields',
-            $this->getAuthUser()
+            $this->authUser()
         ) ?? [];
     }
 

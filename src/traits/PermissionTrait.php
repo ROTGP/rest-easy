@@ -59,7 +59,7 @@ trait PermissionTrait
 
     protected function startEloquentGuard() : void
     {
-        if ($this->guardModels($this->getAuthUser()) !== true) {
+        if ($this->guardModels($this->authUser()) !== true) {
             $this->disableListeningForModelEvents();
             return;
         }
@@ -130,7 +130,7 @@ trait PermissionTrait
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)
             return;
-        $explicitPermissions = $this->explicitPermissions($this->getAuthUser());
+        $explicitPermissions = $this->explicitPermissions($this->authUser());
         $permissionMethodExists = method_exists($model, $permissionMethodName);
         // if permission method not defined, and we're not using explicit permissions
         if (!$permissionMethodExists && !$explicitPermissions)
@@ -138,7 +138,7 @@ trait PermissionTrait
 
         $allowed = false;
         if ($permissionMethodExists) {
-            $authUser = $this->getAuthUser();
+            $authUser = $this->authUser();
             $params = [$authUser];
             if ($secondaryModel !== null)
                 array_unshift($params, $secondaryModel);
@@ -174,7 +174,7 @@ trait PermissionTrait
     protected function buildPermissionException($errorCode, $model, $secondaryModel, $event) : array
     {
         $data = [];
-        $authUser = $this->getAuthUser();
+        $authUser = $this->authUser();
         $data['request_url'] = strtoupper($this->method) . ' ' . $this->request->url();
         $data['request_time'] = Carbon::now()->toString();
         $data['environment'] = App::environment();

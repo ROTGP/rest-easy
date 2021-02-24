@@ -63,7 +63,7 @@ trait CoreTrait
         // be fired - so we simulate a read event
         if (is_a($response, Collection::class) && 
             $response->count() == 0 &&
-            $this->guardModels($this->getAuthUser())) 
+            $this->guardModels($this->authUser())) 
                 $this->onModelEvent(
                     'eloquent.retrieved: ' . get_class($this->model),
                     [$this->model]
@@ -94,7 +94,7 @@ trait CoreTrait
                 $queriedModel = $queriedModels[$i];
                 $key = $queriedModel->getKey();
                 $this->query->where($keyName, $key);
-                $this->applySyncs($queriedModel, $this->getAuthUser());
+                $this->applySyncs($queriedModel, $this->authUser());
                 $queriedModel = $this->applyQueryFilters($key)->first();
                 $queriedModels[$i] = $queriedModel;
             }
@@ -140,7 +140,7 @@ trait CoreTrait
             $hasValidationErrors = false;
             $result = [];
             foreach ($queriedModels as $queriedModel) {
-                if ($this->guardModels($this->getAuthUser()))
+                if ($this->guardModels($this->authUser()))
                     $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
                 
                 $validationErrors = $this->performValidation($queriedModel);
@@ -165,7 +165,7 @@ trait CoreTrait
                 // reset query, in case we're batching
                 if ($this->isBatch)
                     $this->query = $this->model->query();
-                $this->applySyncs($queriedModel, $this->getAuthUser());
+                $this->applySyncs($queriedModel, $this->authUser());
                 
                 $this->query->where($this->model->getKeyName(), $queriedModel->getKey());
                 $result[] = $this->applyQueryFilters($queriedModel->getKey())->first();
@@ -208,7 +208,7 @@ trait CoreTrait
             $hasValidationErrors = false;
             $result = [];
             foreach ($newModels as $newModel) {
-                if ($this->guardModels($this->getAuthUser()))
+                if ($this->guardModels($this->authUser()))
                     $this->onModelEvent('eloquent.creating: ' . get_class($newModel), [$newModel]);
                 $validationErrors = $this->performValidation($newModel);
                 if ($validationErrors !== null) {
@@ -232,7 +232,7 @@ trait CoreTrait
                 // reset query, in case we're batching
                 if ($this->isBatch)
                     $this->query = $this->model->query();
-                $this->applySyncs($newModel, $this->getAuthUser());
+                $this->applySyncs($newModel, $this->authUser());
                 $this->query->where($this->model->getKeyName(), $newModel->getKey());
                 $result[] = $this->applyQueryFilters($newModel->getKey())->first();
             }
