@@ -214,8 +214,8 @@ class EventsTest extends IntegrationTestCase
             ];
             $expected[] = 'saving Artist with id ?';
             $expected[] = 'creating Artist with id ?';
-            $expected[] = 'created Artist with id ' . $i + 12;
-            $expected[] = 'saved Artist with id ' . $i + 12;
+            $expected[] = 'created Artist with id ' . ($i + 12);
+            $expected[] = 'saved Artist with id ' . ($i + 12);
             $expected[] = 'retrieved RecordLabel with id 1';
         }
         $response = $this->asUser(1)->json('POST', $query, $payload);
