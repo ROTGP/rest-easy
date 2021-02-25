@@ -3,9 +3,24 @@
 namespace ROTGP\RestEasy\Test\Controllers;
 
 use Illuminate\Support\Collection;
+use ROTGP\RestEasy\Test\ErrorCodes;
 
 class ArtistController extends BaseController
 {
+    protected function allowBatch($authUser, $action, $count)
+    {
+        if ($authUser->id === 6)
+            return false;
+        
+        if ($authUser->id === 7)
+            return ErrorCodes::AUTH_USER_DENIED_BATCH_PROCESSING;
+        
+        if ($authUser->id === 8)
+            return 'Auth user 8 may not process batches';
+
+        return true;
+    }
+
     protected function useBatchKeys()
     {
         return $this->authUser()->id !== 2;

@@ -5,13 +5,13 @@ class BatchTest extends IntegrationTestCase
 {    
     public function testBatchGet()
     {
-        $ids = '33,2';
-        $query = 'songs/' . $ids;
+        $ids = '4,2';
+        $query = 'artists/' . $ids;
         $response = $this->get($query);
         $json = $this->decodeResponse($response);
         $this->assertIndexedArray($json);
         $this->assertCount(2, $json);
-        $this->assertEquals(33, $json[0]['id']);
+        $this->assertEquals(4, $json[0]['id']);
         $this->assertEquals(2, $json[1]['id']);
     }
 
@@ -418,5 +418,51 @@ class BatchTest extends IntegrationTestCase
         $this->assertArrayHasKey('record_label_id', $errors[0]);
         $this->assertCount(1, $errors[0]['record_label_id']);
         $this->assertEquals('The selected record label id is invalid.', $errors[0]['record_label_id'][0]);
+    }
+
+    public function testBatchAllowance()
+    {
+        $ids = '1,5,3,8';
+        $query = 'artists/' . $ids;
+        $response = $this->get($query)
+            ->assertStatus(200);
+        $json = $this->decodeResponse($response);
+        $this->assertCount(4, $json);
+        $this->assertIndexedArray($json);
+       
+        $response = $this->asUser(6)->get($query)
+            ->assertStatus(422);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayNotHasKey('error_code', $json);
+        $this->assertArrayNotHasKey('error_message', $json);
+       
+        $response = $this->asUser(7)->get($query)
+            ->assertStatus(422);
+        $json = $this->decodeResponse($response);
+        $this->assertEquals(3, $json['error_code']);
+        $this->assertEquals('Auth user denied batch processing', $json['error_message']);
+
+        $response = $this->asUser(8)->get($query)
+            ->assertStatus(422);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayNotHasKey('error_code', $json);
+        $this->assertEquals('Auth user 8 may not process batches', $json['error_message']);
+        
+        $response = $this->asUser(10)->get($query)
+            ->assertStatus(200);
+        $json = $this->decodeResponse($response);
+        $this->assertCount(4, $json);
+        $this->assertIndexedArray($json);
+    }
+
+    public function testBatchGetOnResourceWithNoBatchPermission()
+    {
+        $ids = '4,2';
+        $query = 'songs/' . $ids;
+        $response = $this->get($query)
+            ->assertStatus(422);
+        $json = $this->decodeResponse($response);
+        $this->assertArrayNotHasKey('error_code', $json);
+        $this->assertArrayNotHasKey('error_message', $json);
     }
 }

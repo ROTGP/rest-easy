@@ -82,17 +82,18 @@ trait MetaTrait
 
     protected function will($payload)
     {
-        $verb = $this->methodAlias;
+        $action = $this->methodAlias;
 
-        if ($verb !== 'List')
+        if ($action !== 'List') {
             $payload = collect($payload);
-
-        if (!$this->isBatch && $verb !== 'List') $payload = $payload[0];
+            $this->validateBatch($payload);
+        }
+        if (!$this->isBatch && $action !== 'List') $payload = $payload[0];
         if ($this->isBatch)
-            $verb .= 'Batch';
+            $action .= 'Batch';
         
         $this->disableListeningForModelEvents();
-        $this->{'will' . $verb}($payload);
+        $this->{'will' . $action}($payload);
         $this->enableListeningForModelEvents();
     }
 
@@ -192,5 +193,34 @@ trait MetaTrait
             $keys[$i] = $key;
         }
         return $keys;
+    }
+
+    protected function validateBatch($collection)
+    {
+        if (!$this->isBatch)
+            return;
+        
+        $action = strtolower($this->methodAlias);
+        $allowBatch = $this->allowBatch(
+            $this->authUser(),
+            strtolower($action),
+            $collection->count()
+        );
+        if ($allowBatch === true)
+            return;
+
+        $errorCode = is_int($allowBatch) ? $allowBatch : null;
+        $extras = is_string($allowBatch) ? ['error_message' => $allowBatch] : [];
+       
+        $this->errorResponse(
+            $errorCode,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $extras
+        );
+    }
+
+    protected function allowBatch($authUser, $action, $count)
+    {
+        return false;
     }
 }

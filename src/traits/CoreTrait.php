@@ -259,7 +259,6 @@ trait CoreTrait
             $modelsToDelete[] = $this->findModel($key, true);
 
         $this->isBatch = count($modelsToDelete) > 1;
-
         $this->will($modelsToDelete);
 
         DB::transaction(function () use (&$modelsToDelete) {
