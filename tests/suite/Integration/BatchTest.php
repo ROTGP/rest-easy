@@ -6,13 +6,15 @@ class BatchTest extends IntegrationTestCase
     public function testBatchGet()
     {
         $ids = '4,2';
-        $query = 'artists/' . $ids;
-        $response = $this->get($query);
+        $query = 'artists/' . $ids . '?with=record_label';
+        $response = $this->asUser(1)->get($query);
         $json = $this->decodeResponse($response);
         $this->assertIndexedArray($json);
         $this->assertCount(2, $json);
         $this->assertEquals(4, $json[0]['id']);
         $this->assertEquals(2, $json[1]['id']);
+        $this->assertEquals('cash_money_billionaire_records', $json[0]['record_label']['name']);
+        $this->assertEquals('warner_bros', $json[1]['record_label']['name']);
     }
 
     public function testBatchUpdate()

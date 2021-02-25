@@ -57,6 +57,8 @@ trait PermissionTrait
      */ 
     protected $listening = false;
 
+    protected $ignoreModel = [];
+
     protected function startEloquentGuard() : void
     {
         if ($this->guardModels($this->authUser()) !== true) {
@@ -109,7 +111,7 @@ trait PermissionTrait
         return true;
     }
 
-    protected function onModelEvent($eventName, array $data)
+    protected function onModelEvent($eventName, array $data, $fake = false)
     {
         if ($this->listeningForModelEvents === false)
             return;
@@ -119,13 +121,20 @@ trait PermissionTrait
         $model = $data[0];
         $secondaryModel = $data[1] ?? null;
 
-        // @TODO
-        // $this->disableListeningForModelEvents();
-        // $hookName = $this->getHookName($event);
-        // echo $hookName . "\n";
-        // if (method_exists($model, $hookName))
-        //     $model->{$hookName}();
-        // $this->enableListeningForModelEvents();
+        $ignore = count($this->ignoreModel) && 
+            $this->ignoreModel[0] === $model::class && 
+            $this->ignoreModel[1] === $model->getKey();
+
+        if (!$fake && !$ignore) {
+            // @TODO
+            $this->disableListeningForModelEvents();
+            $hookName = $this->getHookName($event);
+            // dd($hookName);
+            event('resteasy.modelevent', [$hookName . ' ' . class_basename($model::class . ' id: ' . $model->getKey())]);
+            // if (method_exists($model, $hookName))
+            //     $model->{$hookName}();
+            $this->enableListeningForModelEvents();
+        }
         
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)

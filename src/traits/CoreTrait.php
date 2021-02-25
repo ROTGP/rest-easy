@@ -66,7 +66,8 @@ trait CoreTrait
             $this->guardModels($this->authUser())) 
                 $this->onModelEvent(
                     'eloquent.retrieved: ' . get_class($this->model),
-                    [$this->model]
+                    [$this->model],
+                    true
                 );
         return $this->successfulResponse($response);
     }
@@ -87,15 +88,17 @@ trait CoreTrait
 
         $this->isBatch = count($queriedModels) > 1;
         $this->will($queriedModels);
-        
+
         if (!empty($this->queryParams())) {
             $keyName = $this->model->getKeyName();
             for ($i = 0; $i < count($queriedModels); $i++) {
                 $queriedModel = $queriedModels[$i];
                 $key = $queriedModel->getKey();
+                if ($this->isBatch)
+                    $this->query = $this->model->query();
                 $this->query->where($keyName, $key);
                 $this->applySyncs($queriedModel, $this->authUser());
-                $queriedModel = $this->applyQueryFilters($key)->first();
+                $queriedModel = $this->applyQueryFilters($queriedModel)->first();
                 $queriedModels[$i] = $queriedModel;
             }
         }
@@ -141,7 +144,7 @@ trait CoreTrait
             $result = [];
             foreach ($queriedModels as $queriedModel) {
                 if ($this->guardModels($this->authUser()))
-                    $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel]);
+                    $this->onModelEvent('eloquent.updating: ' . get_class($queriedModel), [$queriedModel], true);
                 
                 $validationErrors = $this->performValidation($queriedModel);
                 if ($validationErrors !== null) {
@@ -168,7 +171,7 @@ trait CoreTrait
                 $this->applySyncs($queriedModel, $this->authUser());
                 
                 $this->query->where($this->model->getKeyName(), $queriedModel->getKey());
-                $result[] = $this->applyQueryFilters($queriedModel->getKey())->first();
+                $result[] = $this->applyQueryFilters($queriedModel)->first();
             }
 
             if ($hasValidationErrors)
@@ -209,7 +212,7 @@ trait CoreTrait
             $result = [];
             foreach ($newModels as $newModel) {
                 if ($this->guardModels($this->authUser()))
-                    $this->onModelEvent('eloquent.creating: ' . get_class($newModel), [$newModel]);
+                    $this->onModelEvent('eloquent.creating: ' . get_class($newModel), [$newModel], true);
                 $validationErrors = $this->performValidation($newModel);
                 if ($validationErrors !== null) {
                     $hasValidationErrors = true;
@@ -234,7 +237,7 @@ trait CoreTrait
                     $this->query = $this->model->query();
                 $this->applySyncs($newModel, $this->authUser());
                 $this->query->where($this->model->getKeyName(), $newModel->getKey());
-                $result[] = $this->applyQueryFilters($newModel->getKey())->first();
+                $result[] = $this->applyQueryFilters($newModel)->first();
             }
 
             if ($hasValidationErrors)

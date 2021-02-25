@@ -19,11 +19,14 @@ trait QueryTrait
     protected $appliedGroupBy = [];
     protected $appliedWithCount = [];
 
-    protected function applyQueryFilters($id = null) : Collection {
+    protected function applyQueryFilters($model = null) : Collection {
         $this->applySelects();
         $this->applyWiths();
-        if ($id !== null) {
+        
+        if ($model !== null) {
+            $this->ignoreModel = [$model::class, $model->getKey()];
             $collection = $this->query->get();
+            $this->ignoreModel = [];
             return $collection;
         }
         $this->applyScopes();

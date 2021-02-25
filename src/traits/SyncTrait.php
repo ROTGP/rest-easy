@@ -79,24 +79,24 @@ trait SyncTrait
                 }
                     
                 foreach ($modelsToAttach as $modelToAttach) {
-                    event('eloquent.attaching: ' . get_class($modelToAttach), [$queriedModel, $modelToAttach]);
-                    event('eloquent.attaching: ' . get_class($modelToAttach), [$modelToAttach, $queriedModel]);
+                    $this->onModelEvent('eloquent.attaching: ' . get_class($modelToAttach), [$queriedModel, $modelToAttach], true);
+                    $this->onModelEvent('eloquent.attaching: ' . get_class($modelToAttach), [$modelToAttach, $queriedModel], true);
                 }
 
                 foreach ($modelsToDetach as $modelToDetach) {
-                    event('eloquent.detaching: ' . get_class($modelToDetach), [$queriedModel, $modelToDetach]);
-                    event('eloquent.detaching: ' . get_class($modelToDetach), [$modelToDetach, $queriedModel]);
+                    $this->onModelEvent('eloquent.detaching: ' . get_class($modelToDetach), [$queriedModel, $modelToDetach], true);
+                    $this->onModelEvent('eloquent.detaching: ' . get_class($modelToDetach), [$modelToDetach, $queriedModel], true);
                 }
                 if ($verb === 'attach') $verb = 'syncWithoutDetaching';
                 $queriedModel->{$relationship}()->{$verb}($ids);
 
                 foreach ($modelsToAttach as $modelToAttach) {
-                    event('eloquent.attached: ' . get_class($modelToAttach), [$queriedModel, $modelToAttach]);
-                    event('eloquent.attached: ' . get_class($modelToAttach), [$modelToAttach, $queriedModel]);
+                    $this->onModelEvent('eloquent.attached: ' . get_class($modelToAttach), [$queriedModel, $modelToAttach], true);
+                    $this->onModelEvent('eloquent.attached: ' . get_class($modelToAttach), [$modelToAttach, $queriedModel], true);
                 }
                 foreach ($modelsToDetach as $modelToDetach) {
-                    event('eloquent.detached: ' . get_class($modelToDetach), [$queriedModel, $modelToDetach]);
-                    event('eloquent.detached: ' . get_class($modelToDetach), [$modelToDetach, $queriedModel]);
+                    $this->onModelEvent('eloquent.detached: ' . get_class($modelToDetach), [$queriedModel, $modelToDetach], true);
+                    $this->onModelEvent('eloquent.detached: ' . get_class($modelToDetach), [$modelToDetach, $queriedModel], true);
                 }
             }
         }
