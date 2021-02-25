@@ -22,9 +22,8 @@ trait QueryTrait
     protected function applyQueryFilters($model = null) : Collection {
         $this->applySelects();
         $this->applyWiths();
-        
         if ($model !== null) {
-            $this->ignoreModel = [$model::class, $model->getKey()];
+            $this->ignoreModel = [get_class($model), $model->getKey()];
             $collection = $this->query->get();
             $this->ignoreModel = [];
             return $collection;
