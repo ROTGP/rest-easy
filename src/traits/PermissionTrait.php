@@ -127,7 +127,7 @@ trait PermissionTrait
         $secondaryModel = $data[1] ?? null;
 
         $ignore = count($this->ignoreModel) && 
-            $this->ignoreModel[0] === $model::class && 
+            $this->ignoreModel[0] === get_class($model) && 
             $this->ignoreModel[1] === $model->getKey();
 
         if (!$fake && !$ignore) {
