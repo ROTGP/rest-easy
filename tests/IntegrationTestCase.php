@@ -47,11 +47,6 @@ class IntegrationTestCase extends TestCase
         return json_decode($response->getContent(), true);
     }
 
-    protected function resetController()
-    {
-        $this->app->get(Route::class)->controller = null;
-    }
-
     protected function assertForbidden($response)
     {
         $response->assertStatus(403);

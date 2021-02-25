@@ -7,6 +7,12 @@ use ROTGP\RestEasy\Test\ErrorCodes;
 
 class ArtistController extends BaseController
 {
+    protected function modelEvent($event, $model, $secondaryModel)
+    {
+        $payload = $event . ' ' . class_basename($model) . ' with id ' . ($model->getKey() ?: '?');
+        event('resteasy.modelevent', $payload);
+    }
+
     protected function allowBatch($authUser, $action, $count)
     {
         if ($authUser->id === 6)
@@ -186,6 +192,7 @@ class ArtistController extends BaseController
         $pieces = array_filter(explode('.', $history));
         $pieces[] = $value;
         $model->history = implode('.', $pieces);
-        $model->update();
+        if (!in_array($value, ['willUpdate', 'willUpdateBatch']))
+            $model->update();
     }
 }

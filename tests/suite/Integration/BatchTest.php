@@ -19,8 +19,8 @@ class BatchTest extends IntegrationTestCase
 
     public function testBatchUpdate()
     {
-        $id = '5,8,10';
-        $query = 'artists/' . $id;
+        $ids = '5,8,10';
+        $query = 'artists/' . $ids;
         $response = $this->json('PUT', $query, 
             [
                 [
@@ -55,8 +55,8 @@ class BatchTest extends IntegrationTestCase
 
     public function testBatchUpdateWithSingleElement()
     {
-        $id = '5,8,10';
-        $query = 'artists/' . $id;
+        $ids = '5,8,10';
+        $query = 'artists/' . $ids;
         $response = $this->json('PUT', $query, 
             [
                 [
@@ -344,8 +344,8 @@ class BatchTest extends IntegrationTestCase
     public function testBatchUpdateWithErrorReturnsIdAsKey()
     {
         $query = 'artists?with=record_label';
-        $id = '5,8,10';
-        $query = 'artists/' . $id;
+        $ids = '5,8,10';
+        $query = 'artists/' . $ids;
         $response = $this->asUser(1)->json('PUT', $query, 
             [
                 [
@@ -384,8 +384,8 @@ class BatchTest extends IntegrationTestCase
     public function testBatchUpdateWithErrorReturnsNoIdAsKeyWhenUseBatchKeysIsFalse()
     {
         $query = 'artists?with=record_label';
-        $id = '5,8,10';
-        $query = 'artists/' . $id;
+        $ids = '5,8,10';
+        $query = 'artists/' . $ids;
         $response = $this->asUser(2)->json('PUT', $query, 
             [
                 [
@@ -422,7 +422,7 @@ class BatchTest extends IntegrationTestCase
         $this->assertEquals('The selected record label id is invalid.', $errors[0]['record_label_id'][0]);
     }
 
-    public function testBatchAllowance()
+    public function testCanBatch()
     {
         $ids = '1,5,3,8';
         $query = 'artists/' . $ids;

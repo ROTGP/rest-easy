@@ -111,6 +111,11 @@ trait PermissionTrait
         return true;
     }
 
+    protected function modelEvent($event, $model, $secondaryModel)
+    {
+        //
+    }
+
     protected function onModelEvent($eventName, array $data, $fake = false)
     {
         if ($this->listeningForModelEvents === false)
@@ -126,13 +131,8 @@ trait PermissionTrait
             $this->ignoreModel[1] === $model->getKey();
 
         if (!$fake && !$ignore) {
-            // @TODO
             $this->disableListeningForModelEvents();
-            $hookName = $this->getHookName($event);
-            // dd($hookName);
-            event('resteasy.modelevent', [$hookName . ' ' . class_basename($model::class . ' id: ' . $model->getKey())]);
-            // if (method_exists($model, $hookName))
-            //     $model->{$hookName}();
+            $this->modelEvent($event, $model, $secondaryModel);
             $this->enableListeningForModelEvents();
         }
         
@@ -226,20 +226,5 @@ trait PermissionTrait
         if (array_key_exists($event, $this->eventActions) === false)
             return null;
         return 'can' . Str::studly($this->eventActions[$event]);
-    }
-
-    protected function getHookName($event) : string
-    {
-        $result = '';
-        if (preg_match('/ing$/', $event)) {
-            $result = 'will' . ucfirst(substr($event, 0, -3) . 'e');
-        } else if (preg_match('/ed$/', $event)) {
-            $result = 'did' . ucfirst(substr($event, 0, -1));
-        }
-        if ($result === '')
-            throw new Exception('No hook name found');
-        if (preg_match('/ache$/', $result))
-            $result = substr($result, 0, -1);
-        return $result;
     }
 }
