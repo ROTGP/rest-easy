@@ -57,7 +57,7 @@ trait ResponseTrait
         if (!$isAggregate) {
             $batchString = $this->isBatch ? 'Batch' : '';
             $this->{'did' . $this->methodAlias . $batchString}($response);
-            event('resteasy.after', ['after' . $this->methodAlias . $batchString, $response]);
+            event('resteasy.after', [$this->methodAlias . $batchString, $response]);
         }
         
         if ($this->methodAlias === 'Delete')

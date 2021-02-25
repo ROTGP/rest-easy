@@ -6,146 +6,157 @@ trait HooksTrait
 { 
     // WILL
     
-    public function willList($queryBuilder)
+    protected function willList($queryBuilder)
     {
         //
     }
 
-    public function willGet($model)
+    protected function willGet($model)
     {
         //
     }
 
-    public function willGetBatch($collection)
+    protected function willGetBatch($collection)
     {
         //
     }
 
-    public function willUpdate($model)
+    protected function willUpdate($model)
     {
         //
     }
 
-    public function willUpdateBatch($collection)
+    protected function willUpdateBatch($collection)
     {
         //
     }
 
-    public function willCreate($model)
+    protected function willCreate($model)
     {
         //
     }
 
-    public function willCreateBatch($collection)
+    protected function willCreateBatch($collection)
     {
         //
     }
 
-    public function willDelete($model)
+    protected function willDelete($model)
     {
         //
     }
 
-    public function willDeleteBatch($collection)
+    protected function willDeleteBatch($collection)
     {
         //
     }
     
     // DID
     
-    public function didList($collection)
+    protected function didList($collection)
     {
         //
     }
 
-    public function didGet($model)
+    protected function didGet($model)
     {
         //
     }
 
-    public function didGetBatch($collection)
+    protected function didGetBatch($collection)
     {
         //
     }
 
-    public function didUpdate($model)
+    protected function didUpdate($model)
     {
         //
     }
 
-    public function didUpdateBatch($collection)
+    protected function didUpdateBatch($collection)
     {
         //
     }
 
-    public function didCreate($model)
+    protected function didCreate($model)
     {
         //
     }
 
-    public function didCreateBatch($collection)
+    protected function didCreateBatch($collection)
     {
         //
     }
 
-    public function didDelete($model)
+    protected function didDelete($model)
     {
         //
     }
 
-    public function didDeleteBatch($collection)
+    protected function didDeleteBatch($collection)
     {
         //
     }
 
     // AFTER
 
-    public function useAfterHooks()
+    final public function _useAfterHooks()
+    {
+        return $this->useAfterHooks();
+    }
+
+    protected function useAfterHooks()
     {
         return false;
     }
 
-    public function afterList($collection)
+    public function _after($action, $payload)
+    {
+        return $this->{'after' . $action}($payload);
+    }
+
+    
+    protected function afterList($collection)
     {
         //
     }
 
-    public function afterGet($model)
+    protected function afterGet($model)
     {
         //
     }
 
-    public function afterGetBatch($collection)
+    protected function afterGetBatch($collection)
     {
         //
     }
 
-    public function afterUpdate($model)
+    protected function afterUpdate($model)
     {
         //
     }
 
-    public function afterUpdateBatch($collection)
+    protected function afterUpdateBatch($collection)
     {
         //
     }
 
-    public function afterCreate($model)
+    protected function afterCreate($model)
     {
         //
     }
 
-    public function afterCreateBatch($collection)
+    protected function afterCreateBatch($collection)
     {
         //
     }
 
-    public function afterDelete($model)
+    protected function afterDelete($model)
     {
         //
     }
 
-    public function afterDeleteBatch($collection)
+    protected function afterDeleteBatch($collection)
     {
         //
     }

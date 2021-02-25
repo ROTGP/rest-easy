@@ -24,7 +24,7 @@ class RestEasyMiddleware
 
         // https://laravel.com/docs/8.x/helpers#method-class-uses-recursive
         $usingTrait = in_array(RestEasyTrait::class, class_uses_recursive(self::$controller));
-        $useAfterHooks = self::$controller->useAfterHooks();
+        $useAfterHooks = self::$controller->_useAfterHooks();
         self::$listeningForAfterEvents = $useAfterHooks;
 
         if (self::$listeningForAfterEvents && $usingTrait && $useAfterHooks)
@@ -45,7 +45,7 @@ class RestEasyMiddleware
             return;
         if (self::$hookName == null)
             return;
-        self::$controller->{self::$hookName}(self::$hookPayload);
+        self::$controller->_after(self::$hookName, self::$hookPayload);
     }
 
     private function afterHook(...$value)
