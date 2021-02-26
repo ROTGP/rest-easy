@@ -7,9 +7,10 @@ use ROTGP\RestEasy\Test\ErrorCodes;
 
 class ArtistController extends BaseController
 {
-    protected function modelEvent($event, $model, $secondaryModel)
+    protected function modelEvent($authUser, $event, $model, $secondaryModel)
     {
-        $payload = $event . ' ' . class_basename($model) . ' with id ' . ($model->getKey() ?: '?');
+        $auth = $authUser->id ? ('Auth user ' . $authUser->id) : 'Unspecified auth user';
+        $payload = $auth . ' ' . $event . ' ' . class_basename($model) . ' with id ' . ($model->getKey() ?: 'pending');
         event('resteasy.modelevent', $payload);
     }
 

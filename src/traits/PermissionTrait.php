@@ -111,7 +111,7 @@ trait PermissionTrait
         return true;
     }
 
-    protected function modelEvent($event, $model, $secondaryModel)
+    protected function modelEvent($authUser, $event, $model, $secondaryModel)
     {
         //
     }
@@ -132,7 +132,7 @@ trait PermissionTrait
 
         if (!$fake && !$ignore) {
             $this->disableListeningForModelEvents();
-            $this->modelEvent($event, $model, $secondaryModel);
+            $this->modelEvent($this->authUser(), $event, $model, $secondaryModel);
             $this->enableListeningForModelEvents();
         }
         

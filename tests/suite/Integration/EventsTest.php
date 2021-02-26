@@ -14,7 +14,11 @@ class EventsTest extends IntegrationTestCase
         $query = 'artists/' . $id;
         $this->get($query);
 
-        $this->assertEquals('retrieved Artist with id 5', implode(',', $events));
+        $expected = [
+            'Unspecified auth user retrieved Artist with id 5'
+        ];
+
+        $this->assertEquals($expected, $events);
     }
 
     public function testBasicUpdateEvents()
@@ -30,7 +34,15 @@ class EventsTest extends IntegrationTestCase
             'biography' => 'foo',
             'record_label_id' => 1
             ]);
-        $this->assertEquals('saving Artist with id 5, updating Artist with id 5, updated Artist with id 5, saved Artist with id 5', implode(', ', $events));
+    
+        $expected = [
+            'Unspecified auth user saving Artist with id 5',
+            'Unspecified auth user updating Artist with id 5',
+            'Unspecified auth user updated Artist with id 5',
+            'Unspecified auth user saved Artist with id 5'
+        ];
+
+        $this->assertEquals($expected, $events);
     }
 
     public function testBasicCreateEvents()
@@ -47,7 +59,14 @@ class EventsTest extends IntegrationTestCase
             'record_label_id' => 3,
             ]);
 
-        $this->assertEquals('saving Artist with id ?, creating Artist with id ?, created Artist with id 12, saved Artist with id 12', implode(', ', $events));
+        $expected = [
+            'Unspecified auth user saving Artist with id pending',
+            'Unspecified auth user creating Artist with id pending',
+            'Unspecified auth user created Artist with id 12',
+            'Unspecified auth user saved Artist with id 12'
+        ];
+
+        $this->assertEquals($expected, $events);
     }
 
     public function testBasicDeleteEvents()
@@ -61,7 +80,12 @@ class EventsTest extends IntegrationTestCase
         $query = 'artists/' . $id;
         $this->json('DELETE', $query);
 
-        $this->assertEquals('deleting Artist with id 5, deleted Artist with id 5', implode(', ', $events));
+        $expected = [
+            'Unspecified auth user deleting Artist with id 5',
+            'Unspecified auth user deleted Artist with id 5'
+        ];
+
+        $this->assertEquals($expected, $events);
     }
 
     public function testBatchGetEvents()
@@ -76,10 +100,10 @@ class EventsTest extends IntegrationTestCase
         $response = $this->asUser(1)->get($query);
 
         $expected = [
-            'retrieved Artist with id 4',
-            'retrieved Artist with id 2',
-            'retrieved RecordLabel with id 7',
-            'retrieved RecordLabel with id 1'
+            'Auth user 1 retrieved Artist with id 4',
+            'Auth user 1 retrieved Artist with id 2',
+            'Auth user 1 retrieved RecordLabel with id 7',
+            'Auth user 1 retrieved RecordLabel with id 1'
         ];
         $this->assertEquals($expected, $events);
     }
@@ -114,18 +138,18 @@ class EventsTest extends IntegrationTestCase
         );
 
         $expected = [
-            'saving Artist with id 5',
-            'updating Artist with id 5',
-            'updated Artist with id 5',
-            'saved Artist with id 5',
-            'saving Artist with id 8',
-            'updating Artist with id 8',
-            'updated Artist with id 8',
-            'saved Artist with id 8',
-            'saving Artist with id 10',
-            'updating Artist with id 10',
-            'updated Artist with id 10',
-            'saved Artist with id 10'
+            'Unspecified auth user saving Artist with id 5',
+            'Unspecified auth user updating Artist with id 5',
+            'Unspecified auth user updated Artist with id 5',
+            'Unspecified auth user saved Artist with id 5',
+            'Unspecified auth user saving Artist with id 8',
+            'Unspecified auth user updating Artist with id 8',
+            'Unspecified auth user updated Artist with id 8',
+            'Unspecified auth user saved Artist with id 8',
+            'Unspecified auth user saving Artist with id 10',
+            'Unspecified auth user updating Artist with id 10',
+            'Unspecified auth user updated Artist with id 10',
+            'Unspecified auth user saved Artist with id 10'
         ];
         $this->assertEquals($expected, $events);
     }
@@ -157,21 +181,21 @@ class EventsTest extends IntegrationTestCase
         ]);
 
         $expected = [
-            'saving Artist with id ?',
-            'creating Artist with id ?',
-            'created Artist with id 12',
-            'saved Artist with id 12',
-            'retrieved RecordLabel with id 3',
-            'saving Artist with id ?',
-            'creating Artist with id ?',
-            'created Artist with id 13',
-            'saved Artist with id 13',
-            'retrieved RecordLabel with id 2',
-            'saving Artist with id ?',
-            'creating Artist with id ?',
-            'created Artist with id 14',
-            'saved Artist with id 14',
-            'retrieved RecordLabel with id 1'
+            'Auth user 1 saving Artist with id pending',
+            'Auth user 1 creating Artist with id pending',
+            'Auth user 1 created Artist with id 12',
+            'Auth user 1 saved Artist with id 12',
+            'Auth user 1 retrieved RecordLabel with id 3',
+            'Auth user 1 saving Artist with id pending',
+            'Auth user 1 creating Artist with id pending',
+            'Auth user 1 created Artist with id 13',
+            'Auth user 1 saved Artist with id 13',
+            'Auth user 1 retrieved RecordLabel with id 2',
+            'Auth user 1 saving Artist with id pending',
+            'Auth user 1 creating Artist with id pending',
+            'Auth user 1 created Artist with id 14',
+            'Auth user 1 saved Artist with id 14',
+            'Auth user 1 retrieved RecordLabel with id 1'
         ];
         $this->assertEquals($expected, $events);
     }
@@ -186,12 +210,12 @@ class EventsTest extends IntegrationTestCase
         $idsToDelete = '2,5,9';
         $response = $this->json('DELETE', 'artists/' . $idsToDelete);
         $expected = [
-            'deleting Artist with id 2',
-            'deleted Artist with id 2',
-            'deleting Artist with id 5',
-            'deleted Artist with id 5',
-            'deleting Artist with id 9',
-            'deleted Artist with id 9'
+            'Unspecified auth user deleting Artist with id 2',
+            'Unspecified auth user deleted Artist with id 2',
+            'Unspecified auth user deleting Artist with id 5',
+            'Unspecified auth user deleted Artist with id 5',
+            'Unspecified auth user deleting Artist with id 9',
+            'Unspecified auth user deleted Artist with id 9'
         ];
         $this->assertEquals($expected, $events);
     }
@@ -212,11 +236,11 @@ class EventsTest extends IntegrationTestCase
                 'biography' => 'bio' . $i,
                 'record_label_id' => 1
             ];
-            $expected[] = 'saving Artist with id ?';
-            $expected[] = 'creating Artist with id ?';
-            $expected[] = 'created Artist with id ' . ($i + 12);
-            $expected[] = 'saved Artist with id ' . ($i + 12);
-            $expected[] = 'retrieved RecordLabel with id 1';
+            $expected[] = 'Auth user 1 saving Artist with id pending';
+            $expected[] = 'Auth user 1 creating Artist with id pending';
+            $expected[] = 'Auth user 1 created Artist with id ' . ($i + 12);
+            $expected[] = 'Auth user 1 saved Artist with id ' . ($i + 12);
+            $expected[] = 'Auth user 1 retrieved RecordLabel with id 1';
         }
         $response = $this->asUser(1)->json('POST', $query, $payload);
         $this->assertEquals($expected, $events);
