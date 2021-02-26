@@ -4,7 +4,6 @@ namespace ROTGP\RestEasy\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
-
 use Symfony\Component\HttpFoundation\Response;
 
 use Str;
@@ -13,7 +12,7 @@ trait RequestTrait
 {   
     protected function queryParams() : array
     {
-        return $this->request->query();    
+        return $this->request->query();
     }
 
     protected function payload($prune = false, $model = null, $payload = null) : array
