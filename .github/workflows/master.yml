@@ -1,4 +1,3 @@
-# https://rubenvanassche.com/testing-php-packages-with-github-actions/
 name: Tests (master)
 
 on:
@@ -12,7 +11,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-latest] #, windows-latest, macOS-latest
+        os: [ubuntu-latest, windows-latest, macOS-latest]
         php: [8.0, 7.4, 7.3]
         testbench: [6.0, 5.0]
         include:

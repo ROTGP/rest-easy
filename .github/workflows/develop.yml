@@ -1,21 +1,27 @@
 # https://rubenvanassche.com/testing-php-packages-with-github-actions/
-name: Tests (develop)
+name: Tests (master)
 
 on:
   push:
-    branches-ignore:
-      - master
+    branches:
+      - develop
 
 jobs:
   tests:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.os }}
     
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
-        php-versions: [7.3, 7.4, 8.0]
+        os: [ubuntu-latest]
+        php: [8.0, 7.4, 7.3]
+        testbench: [6.0, 5.0]
+        include:
+          - testbench: 6.0
+            laravel: 8.0
+          - testbench: 5.0
+            laravel: 7.0
 
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    name: PHP v${{ matrix.php }} - Laravel v${{ matrix.laravel }} (Testbench v${{ matrix.testbench }}) on ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,7 +29,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: intl, fileinfo, pdo_sqlite
           ini-values: "post_max_size=256M"
 
@@ -34,7 +40,9 @@ jobs:
           key: composer-${{ hashFiles('composer.lock') }}
 
       - name: Run composer install
-        run: composer install -n --prefer-dist
+        run: |
+             composer install -n --prefer-dist
+             composer require "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --with-all-dependencies
         env:
           APP_ENV: testing
         
