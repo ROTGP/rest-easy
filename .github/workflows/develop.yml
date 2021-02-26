@@ -1,5 +1,5 @@
 # https://rubenvanassche.com/testing-php-packages-with-github-actions/
-name: Tests (master)
+name: Tests (develop)
 
 on:
   push:
