@@ -245,4 +245,66 @@ class EventsTest extends IntegrationTestCase
         $response = $this->asUser(1)->json('POST', $query, $payload);
         $this->assertEquals($expected, $events);
     }
+
+    public function testNoEventsWhenEventsAreNotEnabled()
+    {
+        $events = [];
+        Event::listen('resteasy.modelevent', function ($value) use (&$events) {
+            $events[] = $value;
+        });
+
+        $ids = '4,2';
+        $query = 'artists/' . $ids . '?with=record_label';
+        $response = $this->asUser(8)->get($query);
+
+        $expected = [];
+        $this->assertEquals($expected, $events);
+    }
+
+    public function testEventsWhenPermissionsAreDisabled()
+    {
+        $events = [];
+        Event::listen('resteasy.modelevent', function ($value) use (&$events) {
+            $events[] = $value;
+        });
+
+        $ids = '4,2';
+        $query = 'artists/' . $ids;
+
+        /**
+         * user 5 may not read artists, but user 5 also 
+         * disables the eloquent guard, so finally the 
+         * artists are readable. Events should fire even
+         * though the eloquent guard is disabled.
+         */ 
+        $response = $this->asUser(5)->get($query);
+
+        $expected = [
+            'Auth user 5 retrieved Artist with id 4',
+            'Auth user 5 retrieved Artist with id 2'
+        ];
+        $this->assertEquals($expected, $events);
+    }
+
+    public function testNoEventsWhenEventsAreDisabledButPermissionsAreEnabled()
+    {
+        $events = [];
+        Event::listen('resteasy.modelevent', function ($value) use (&$events) {
+            $events[] = $value;
+        });
+
+        $id = 4;
+        $query = 'artists/' . $id;
+
+        /**
+         * user 8 may read artists, and  the eloquent 
+         * guard will be enabled. Events should be 
+         * disabled and thus should not fire.
+         */ 
+        $response = $this->asUser(8)->get($query);
+        $response->assertStatus(200);
+
+        $expected = [];
+        $this->assertEquals($expected, $events);
+    }
 }

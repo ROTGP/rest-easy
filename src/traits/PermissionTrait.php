@@ -59,9 +59,14 @@ trait PermissionTrait
 
     protected $ignoreModel = [];
 
+    protected $guardEloquentModels = false;
+    protected $useEloquentEvents = false;
+
     protected function startEloquentGuard() : void
     {
-        if ($this->guardModels($this->authUser()) !== true) {
+        $this->guardEloquentModels = $this->guardModels($this->authUser()) === true;
+        $this->useEloquentEvents = $this->useModelEvents($this->authUser()) === true;
+        if (!$this->guardEloquentModels && !$this->useEloquentEvents) {
             $this->disableListeningForModelEvents();
             return;
         }
@@ -99,6 +104,11 @@ trait PermissionTrait
         return true;
     }
 
+    protected function useModelEvents($authUser)
+    {
+        return true;
+    }
+
     /**
      * If true, each permission method must be defined 
      * explicitly on the model, and the absence of the
@@ -126,6 +136,15 @@ trait PermissionTrait
         $model = $data[0];
         $secondaryModel = $data[1] ?? null;
 
+        if ($this->guardEloquentModels)
+            $this->assessPermission($event, $model, $secondaryModel);
+
+        if ($this->useEloquentEvents)
+            $this->assessEvents($event, $model, $secondaryModel, $fake);
+    }
+
+    protected function assessEvents($event, $model, $secondaryModel, $fake)
+    {
         $ignore = count($this->ignoreModel) && 
             $this->ignoreModel[0] === get_class($model) && 
             $this->ignoreModel[1] === $model->getKey();
@@ -135,7 +154,10 @@ trait PermissionTrait
             $this->modelEvent($this->authUser(), $event, $model, $secondaryModel);
             $this->enableListeningForModelEvents();
         }
-        
+    }
+
+    protected function assessPermission($event, $model, $secondaryModel)
+    {
         $permissionMethodName = $this->getPermissionName($event);
         if ($permissionMethodName === null)
             return;

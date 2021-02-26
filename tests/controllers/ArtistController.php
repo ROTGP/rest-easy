@@ -7,6 +7,16 @@ use ROTGP\RestEasy\Test\ErrorCodes;
 
 class ArtistController extends BaseController
 {
+    protected function useModelEvents($authUser)
+    {
+        return $authUser->id !== 8;
+    }
+
+    protected function guardModels($authUser)
+    {
+        return $authUser->id !== 5;
+    }
+    
     protected function modelEvent($authUser, $event, $model, $secondaryModel)
     {
         $auth = $authUser->id ? ('Auth user ' . $authUser->id) : 'Unspecified auth user';
