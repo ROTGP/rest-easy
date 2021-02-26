@@ -3,8 +3,8 @@
 namespace ROTGP\RestEasy\Traits;
 
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\HttpFoundation\Response;
 
 use Schema;
 use ReflectionClass;
@@ -21,7 +21,7 @@ trait MetaTrait
     protected function updateBatchPayloadKey($updating, $model, $payload)
     {
         $key = null;
-        // if we're updating, the native key (id) will always be in the payload
+        // if we're updating, the native key will always be in the payload
         if ($updating) {
             $key = strval($payload[$model->getKeyName()]);
         } else {
@@ -46,7 +46,7 @@ trait MetaTrait
     }
 
     /**
-     * Returns a the fillable fields of the model,
+     * Returns array of the fillable fields of the model,
      * excluding $immutable fields when the model
      * is being updated.
      *
@@ -65,7 +65,6 @@ trait MetaTrait
 
     public function getImmutableFields() : array
     {
-
         return $this->callModelMethod(
             $this->queriedModel(),
             'immutableFields',

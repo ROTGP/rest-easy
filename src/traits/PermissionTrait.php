@@ -60,6 +60,7 @@ trait PermissionTrait
     protected $ignoreModel = [];
 
     protected $guardEloquentModels = false;
+    
     protected $useEloquentEvents = false;
 
     protected function startEloquentGuard() : void

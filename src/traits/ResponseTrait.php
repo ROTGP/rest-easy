@@ -62,7 +62,7 @@ trait ResponseTrait
         
         if ($this->methodAlias === 'Delete')
             return response()->json(null, $this->successfulHttpCode());
-
+        
         return response()->json($response, $this->successfulHttpCode());
     }
 

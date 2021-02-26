@@ -23,6 +23,7 @@ trait RestEasyTrait
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int|string  $resource
      * @return \Illuminate\Http\Response
      */
@@ -56,7 +57,8 @@ trait RestEasyTrait
 
     /**
      * Remove the specified resource from storage.
-     *
+     * 
+     * @param  \Illuminate\Http\Request  $request
      * @param  int|string  $resource
      * @return \Illuminate\Http\Response
      */

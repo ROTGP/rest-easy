@@ -5,7 +5,6 @@ namespace ROTGP\RestEasy\Traits;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
-
 use Symfony\Component\HttpFoundation\Response;
 
 use Str;

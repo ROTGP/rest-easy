@@ -108,7 +108,6 @@ trait QueryTrait
         }
     }
 
-
     public function applyOrderBy() : void
     {
         $queryParams = $this->queryParams();

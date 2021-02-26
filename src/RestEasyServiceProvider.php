@@ -3,7 +3,6 @@
 namespace ROTGP\RestEasy;
 
 use ROTGP\RestEasy\Http\Middleware\RestEasyMiddleware;
-
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
