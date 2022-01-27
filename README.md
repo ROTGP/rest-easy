@@ -27,6 +27,9 @@ Table of contents
    * [Features-at-a-glance](#features-at-a-glance)
    * [Installation](#installation)
    * [Model discovery](#model-discovery)
+   * [Validation](#validation)
+   * [Permissions](#permissions)
+   * [Querying](#querying)
    * [Tests](#tests)
    * [Contributing](#contributing)
    * [License](#license)
@@ -86,6 +89,7 @@ Just drop the trait into your controller.
 
 ```php
 use Illuminate\Routing\Controller;
+
 class FooController extends Controller
 {
     use RestEasyTrait;
@@ -117,6 +121,7 @@ Alternatively, the controller may implement the `modelNamespace` method, which r
 
 ```php
 use Illuminate\Routing\Controller;
+
 class BaseController extends Controller
 {
     use RestEasyTrait;
@@ -137,6 +142,7 @@ Simply define your [rules](https://laravel.com/docs/7.x/validation#available-val
 
 ```php
 use Illuminate\Database\Eloquent\Model;
+
 class Foo extends Model
 {
     public function validationRules($authUser)
@@ -164,6 +170,7 @@ When using model rules, simply specify the field as 'model'. The corresponding v
 
 ```php
 use Illuminate\Database\Eloquent\Model;
+
 class Foo extends Model
 {
     public function validationRules($authUser)
@@ -176,10 +183,12 @@ class Foo extends Model
             'model' => 'combined_length:name,title,550'
         ];
     }
+
     public function validateNotReserved($field, $value, $params) {
         if (in_array($value, $params))
           return $field . ' may not contain: ' . implode(',', $params);
     }
+
     public function validateCombinedLength($field, $value, $params) {
         $val1 = $value[$params[0]];
         $val2 = $value[$params[1]];
@@ -201,6 +210,284 @@ class Foo extends Model
 - the `$params` parameter refers to the parameters (an array) to be passed from the rule definitions. For example, the `validateFoo` method for the `'foo:bar,baz'` rule definition will receive the `$params` of `['bar', 'baz']`. If no params are passed, then this array will be empty.
 
 <br>
+
+
+## Permissions
+There are many packages available to handle laravel
+permissions, but I find most/all of them to be verbose,
+unintuitive and inflexible. With `rest-easy`, it's as
+simple as defining `can{verb}` methods on the model, and
+returning a boolean. The `$authUser` (authenticated user
+making the current request, if any) will be passed to
+the method. All permissions are open by default, but
+it's easy to create object-oriented base classes to
+define your rules, and customize them as required. 
+
+Note that these permissions depend on Eloquent events,
+and as such, if multiple models are accessed through a
+join (using Laravel's `with` helper), then permission
+will be required for even deeply nested models. If one
+of the model's pernmission fails, then the entire
+request will be aborted.
+
+Of course, as these permissions depend on Eloquent events,
+if your request doesn't interact with the database (or
+Eloquent models), then you'll need to implement your own
+logic.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Foo extends Model
+{
+    public function canCreate($authUser)
+    {
+        return true;
+    }
+
+    public function canRead($authUser)
+    {
+        return true;
+    }
+
+    public function canUpdate($authUser)
+    {
+        return true;
+    }
+
+    public function canAttach($modelToAttach, $authUser)
+    {
+        return true;
+    }
+
+    public function canDetach($modelToDetach, $authUser)
+    {
+        return true;
+    }
+}
+```
+
+
+#### Context-specific logic
+With the exception of `canCreate`, remember that the
+method being called is on the instance of the model
+being accessed, so code based rules are easy to
+implement.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Foo extends Model
+{
+    public function canRead($authUser)
+    {
+        return $authUser->id === $this->user->id && !$this->user->blocked;
+    }
+}
+```
+
+
+## Querying
+Once again, Laravel offers ways to query models, but it
+tends to be verbose. `Rest-Easy` makes it a breeze.
+
+### Safe relationships
+Define a method `safeRelationships` on any model to
+define which related models may be queried. Return an
+array of relationships names which correspond to methods which
+define Laravel's native relationships.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Foo extends Model
+{
+    public function safeRelationships($authUser)
+    {
+        return ['bar', 'bazzes'];
+    }
+
+    public function bar()
+    {
+        return $this->hasOne(Bar::class);
+    }
+
+    public function bazzes()
+    {
+        return $this->hasMany(Baz::class);
+    }
+}
+```
+
+Once defined, the resource may be queried using the
+'with' GET variable. Note that this also works with
+other verbs (update, post, patch). For example when
+updating a resource, you may request related entities in
+the same request.
+
+`GET https://myapi.com/foos?with=bar,bazzes`
+
+### Safe scopes
+Laravel already provides a great API to make scoped
+queries, but it can be verbose and inflexible.
+`Rest-Easy` aims to make it concise and flexible. Simple
+define a `safeScopes` methods on your model, and return
+a list of scopes which correspond to standard Laravel
+`scope` methods on said model. 
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Foo extends Model
+{
+    public function safeScopes($authUser)
+    {
+        return ['born_after'];
+    }
+
+    public function scopeBornAfter($query, $params)
+    {
+        return $query->where('date_of_birth', '>', Carbon::parse($params));
+    }
+}
+```
+
+Once defined, the resource may be queried using any
+number of scopes. For example, with the above example,
+the following query may be performed to find `foos` born
+after the October 15th 1980:
+
+`GET https://myapi.com/foos?born_after=1980-10-15`
+
+
+### Auto-pagination
+Really. It's another task that should be easy but
+requires a surprising amount of code. If the client
+desires paginated results, then simply provide `page`
+and `page_size` `GET` variables. That's all there is to it.
+
+`GET https://myapi.com/foos?page=5&page_size=20`
+
+And expect a JSON response like:
+
+```php
+[
+    'page' : 5,
+    'page_size' : 20,
+    'total_results': 134,
+    'total_pages': 7,
+    'data' => [
+       /// items
+    ]
+]
+```
+
+
+
+### Implicit scopes
+Make implicit scopes on any model by defining a
+`scopeImplicit` method. This scope will be applied
+implicitly to all requests for the given model, and is
+handy for scoping context-based queries, such as the
+user making the request.
+
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+class Foo extends Model
+{
+    public function scopeImplicit($query)
+    {
+        $authUserId = optional(auth()->user())->id;
+        if ($authUserId === null) 
+            return;
+        $query->whereHas('bars', function ($query1) use ($authUserId) {
+            $query1->where('bar_user.user_id', $authUserId); 
+        });
+    }
+
+    public function bars()
+    {
+        return $this->belongsToMany(Bar::class);
+    }
+}
+```
+
+`GET https://myapi.com/foos?with=bars`
+
+This will return `foos` with their associated `bars`, but
+only where `bars` and `users` exist on a pivot table,
+and `bar_user.user_id` matches the id of the user making
+the (authenticated) request.
+
+### Custom selects
+Similar in concept to `Graphql`, simply specify the
+columns using a `select` parameter, and only those
+columns will be returned. Helpful for complex models
+with many columns. 
+
+`GET https://myapi.com/foos/1?select=name,age`
+
+### Order by
+
+Ordering records in Laravel is usually straight-forward,
+but it gets complicated for multiple fields.
+`Rest-Easy`, of course, makes this easy.
+
+Standard
+
+`GET https://myapi.com/songs?order_by=album_id`
+
+Ascending (default)
+
+`GET https://myapi.com/songs?order_by=album_id,asc`
+
+Descending
+
+`GET https://myapi.com/songs?order_by=album_id,desc`
+
+Multiple fields, descending
+
+`GET https://myapi.com/songs?order_by=album_id,length_seconds,desc`
+
+
+### Aggregation queries
+The client can make complex aggregation queries using
+any of the following verbs, and specifying the column(s)
+of interest. These requests are heavily sanitized and
+are not vulnerable to SQL injection attacks. However,
+please note that permissions won't be checked as
+individual Eloquent models are never accessed individually.
+
+`count`, `sum`, `avg`, `min`, `max`
+
+For example: 
+
+`GET https://myapi.com/songs?avg=length_seconds`
+
+`GET https://myapi.com/songs?avg=length_seconds&group_by=album_id`
+
+`GET https://myapi.com/songs?songs?max=length_seconds`
+
+`GET https://myapi.com/songs?max=length_seconds&group_by=album_id`
+
+`GET https://myapi.com/songs?songs?count=id`
+
+`GET https://myapi.com/songs?count=id&group_by=album_id`
+
+`GET https://myapi.com/songs?sum=length_seconds`
+
+`GET https://myapi.com/songs?sum=length_seconds&group_by=album_id`
+
+`GET
+https://myapi.com/songs?sum=length_seconds&group_by=album_id&order_by=length_seconds_sum,desc`
+
+`GET https://myapi.com/songs?songs?sum=length_seconds&group_by=album_id&order_by=length_seconds_sum,desc&longer_than=200`
+
+`GET
+https://myapi.com/songs?sum=id&min=length_seconds&max=length_seconds&avg=length_seconds&count=album_id`
+
 
 Tests
 ============
